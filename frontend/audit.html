@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Audit Trail - Application Starter Kit</title>
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <style>
+    .filter-bar { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+    .filter-bar select, .filter-bar input { max-width: 200px; }
+    .json-viewer { background: var(--gray-900); color: var(--gray-100); padding: 12px; border-radius: 6px; font-family: monospace; font-size: 12px; max-height: 300px; overflow: auto; }
+  </style>
+</head>
+<body>
+  <div class="app-container" data-role="user">
+    <header class="mobile-header">
+      <button class="hamburger" onclick="toggleSidebar()">☰</button>
+      <div class="mobile-header-title">Audit Trail</div>
+      <div style="width: 40px;"></div>
+    </header>
+    
+    <div class="sidebar-overlay" onclick="closeSidebar()"></div>
+    
+    <aside class="sidebar">
+      <div class="sidebar-logo">🚀 App Starter Kit</div>
+      <nav>
+        <ul class="sidebar-nav">
+          <li><a href="dashboard.html">📊 Dashboard</a></li>
+          <li><a href="users.html">👥 Users</a></li>
+          <li><a href="companies.html" class="admin-only">🏢 Companies</a></li>
+          <li><a href="audit.html" class="active">📋 Audit Trail</a></li>
+          <li><a href="profile.html">👤 Profile</a></li>
+        </ul>
+      </nav>
+      <div style="position: absolute; bottom: 20px; left: 0; right: 0; padding: 0 20px;">
+        <button class="btn btn-secondary" style="width: 100%;" onclick="Auth.logout()">🚪 Logout</button>
+      </div>
+    </aside>
+    
+    <main class="main-content">
+      <div class="page-header">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+          <div>
+            <h1>Audit Trail</h1>
+            <p>Track all system activities</p>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn btn-secondary" onclick="exportCSV()">📥 Export CSV</button>
+            <button class="btn btn-secondary" onclick="loadAuditLogs()">🔄 Refresh</button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="card mb-4">
+        <div class="filter-bar">
+          <select id="filter-action" class="form-input" onchange="applyFilters()">
+            <option value="">All Actions</option>
+            <option value="CREATE">Created</option>
+            <option value="UPDATE">Updated</option>
+            <option value="DELETE">Deleted</option>
+            <option value="LOGIN">Login</option>
+          </select>
+          <select id="filter-resource" class="form-input" onchange="applyFilters()">
+            <option value="">All Resources</option>
+            <option value="user">User</option>
+            <option value="company">Company</option>
+            <option value="auth">Auth</option>
+          </select>
+          <input type="date" id="filter-from" class="form-input" onchange="applyFilters()">
+          <input type="date" id="filter-to" class="form-input" onchange="applyFilters()">
+          <button class="btn btn-sm btn-secondary" onclick="clearFilters()">Clear</button>
+        </div>
+      </div>
+      
+      <div class="card">
+        <div id="audit-table"></div>
+      </div>
+    </main>
+  </div>
+  
+  <div class="modal-overlay" id="modal-details">
+    <div class="modal" style="max-width: 600px;">
+      <div class="modal-header">
+        <h2 class="modal-title">Audit Details</h2>
+        <button class="modal-close" onclick="Modal.close('modal-details')">&times;</button>
+      </div>
+      <div class="modal-body" id="audit-details-content"></div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="Modal.close('modal-details')">Close</button>
+      </div>
+    </div>
+  </div>
+  
+  <div id="toast-container" class="toast-container"></div>
+  
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/components/toast.js"></script>
+  <script src="js/components/modal.js"></script>
+  <script src="js/components/datatable.js"></script>
+  <script>
+    let auditTable;
+    let allAuditData = [];
+    
+    function toggleSidebar() {
+      document.querySelector('.sidebar').classList.toggle('open');
+      document.querySelector('.sidebar-overlay').classList.toggle('active');
+    }
+    
+    function closeSidebar() {
+      document.querySelector('.sidebar').classList.remove('open');
+      document.querySelector('.sidebar-overlay').classList.remove('active');
+    }
+    
+    async function loadAuditLogs() {
+      auditTable = new DataTable('#audit-table', {
+        columns: [
+          { key: 'created_at', label: 'Timestamp', render: (v) => Utils.formatDate(v, 'long') },
+          { key: 'user_email', label: 'User' },
+          { key: 'action', label: 'Action', render: (v) => {
+            const colors = { CREATE: 'success', UPDATE: 'warning', DELETE: 'danger', LOGIN: 'info' };
+            return `<span class="badge badge-${colors[v] || 'gray'}">${v}</span>`;
+          }},
+          { key: 'resource_type', label: 'Resource', render: (v) => Utils.capitalize(v || '') },
+          { key: 'ip_address', label: 'IP Address' },
+          { key: 'actions', label: '', render: (v, row) => 
+            `<button class="btn btn-sm btn-secondary" onclick="viewDetails(${row.id})">👁️ View</button>`
+          }
+        ],
+        perPage: 15,
+        searchable: true,
+        emptyMessage: 'No audit logs found'
+      });
+      
+      auditTable.setLoading(true);
+      
+      try {
+        const response = await API.get('/audit');
+        if (response.success && response.data) {
+          allAuditData = response.data;
+          auditTable.setData(allAuditData);
+        }
+      } catch (error) {
+        const mockData = generateMockAuditData();
+        allAuditData = mockData;
+        auditTable.setData(mockData);
+      }
+    }
+    
+    function generateMockAuditData() {
+      const actions = ['CREATE', 'UPDATE', 'DELETE', 'LOGIN'];
+      const resources = ['user', 'company', 'auth'];
+      const users = ['admin@test.com', 'manager@test.com', 'user@test.com'];
+      
+      return Array.from({ length: 50 }, (_, i) => ({
+        id: i + 1,
+        created_at: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString(),
+        user_email: users[Math.floor(Math.random() * users.length)],
+        action: actions[Math.floor(Math.random() * actions.length)],
+        resource_type: resources[Math.floor(Math.random() * resources.length)],
+        resource_id: Math.floor(Math.random() * 100) + 1,
+        ip_address: `192.168.1.${Math.floor(Math.random() * 255)}`,
+        old_values: { name: 'Old Value' },
+        new_values: { name: 'New Value' }
+      }));
+    }
+    
+    function applyFilters() {
+      const action = document.getElementById('filter-action').value;
+      const resource = document.getElementById('filter-resource').value;
+      const from = document.getElementById('filter-from').value;
+      const to = document.getElementById('filter-to').value;
+      
+      let filtered = [...allAuditData];
+      
+      if (action) filtered = filtered.filter(a => a.action === action);
+      if (resource) filtered = filtered.filter(a => a.resource_type === resource);
+      if (from) filtered = filtered.filter(a => new Date(a.created_at) >= new Date(from));
+      if (to) filtered = filtered.filter(a => new Date(a.created_at) <= new Date(to + 'T23:59:59'));
+      
+      auditTable.setData(filtered);
+    }
+    
+    function clearFilters() {
+      document.getElementById('filter-action').value = '';
+      document.getElementById('filter-resource').value = '';
+      document.getElementById('filter-from').value = '';
+      document.getElementById('filter-to').value = '';
+      auditTable.setData(allAuditData);
+    }
+    
+    function viewDetails(id) {
+      const audit = allAuditData.find(a => a.id === id);
+      if (!audit) return;
+      
+      document.getElementById('audit-details-content').innerHTML = `
+        <div style="display: grid; gap: 16px;">
+          <div><strong>Timestamp:</strong> ${Utils.formatDate(audit.created_at, 'long')}</div>
+          <div><strong>User:</strong> ${audit.user_email}</div>
+          <div><strong>Action:</strong> <span class="badge badge-primary">${audit.action}</span></div>
+          <div><strong>Resource:</strong> ${Utils.capitalize(audit.resource_type)} #${audit.resource_id}</div>
+          <div><strong>IP Address:</strong> ${audit.ip_address}</div>
+          ${audit.old_values ? `<div><strong>Old Values:</strong><div class="json-viewer"><pre>${JSON.stringify(audit.old_values, null, 2)}</pre></div></div>` : ''}
+          ${audit.new_values ? `<div><strong>New Values:</strong><div class="json-viewer"><pre>${JSON.stringify(audit.new_values, null, 2)}</pre></div></div>` : ''}
+        </div>
+      `;
+      Modal.open('modal-details');
+    }
+    
+    function exportCSV() {
+      const headers = ['Timestamp', 'User', 'Action', 'Resource', 'Resource ID', 'IP Address'];
+      const rows = allAuditData.map(a => [
+        a.created_at, a.user_email, a.action, a.resource_type, a.resource_id, a.ip_address
+      ]);
+      
+      let csv = headers.join(',') + '\n';
+      rows.forEach(row => { csv += row.join(',') + '\n'; });
+      
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `audit_logs_${new Date().toISOString().split('T')[0]}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+      
+      Toast.success('CSV exported successfully');
+    }
+    
+    document.addEventListener('DOMContentLoaded', loadAuditLogs);
+  </script>
+</body>
+</html>

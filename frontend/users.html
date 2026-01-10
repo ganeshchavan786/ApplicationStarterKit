@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#2563eb">
+  <title>Users - Application Starter Kit</title>
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <style>
+    .datatable-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; }
+    .datatable-search { flex: 1; max-width: 300px; }
+    .datatable-loading { padding: 60px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 16px; }
+  </style>
+</head>
+<body>
+  <div class="app-container" data-role="user">
+    <header class="mobile-header">
+      <button class="hamburger" onclick="toggleSidebar()">☰</button>
+      <div class="mobile-header-title">Users</div>
+      <div style="width: 40px;"></div>
+    </header>
+    
+    <div class="sidebar-overlay" onclick="closeSidebar()"></div>
+    
+    <aside class="sidebar">
+      <div class="sidebar-logo">🚀 App Starter Kit</div>
+      <nav>
+        <ul class="sidebar-nav">
+          <li><a href="dashboard.html">📊 Dashboard</a></li>
+          <li><a href="users.html" class="active">👥 Users</a></li>
+          <li><a href="companies.html" class="admin-only">🏢 Companies</a></li>
+          <li><a href="audit.html">📋 Audit Trail</a></li>
+          <li><a href="profile.html">👤 Profile</a></li>
+        </ul>
+      </nav>
+      <div style="position: absolute; bottom: 20px; left: 0; right: 0; padding: 0 20px;">
+        <button class="btn btn-secondary" style="width: 100%;" onclick="Auth.logout()">🚪 Logout</button>
+      </div>
+    </aside>
+    
+    <main class="main-content">
+      <div class="page-header">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+          <div>
+            <h1>Users</h1>
+            <p>Manage users in your company</p>
+          </div>
+          <button class="btn btn-primary admin-only" onclick="openCreateModal()">➕ Add User</button>
+        </div>
+      </div>
+      
+      <div class="card">
+        <div id="users-table"></div>
+      </div>
+    </main>
+  </div>
+  
+  <!-- Create/Edit User Modal -->
+  <div class="modal-overlay" id="modal-user">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title" id="modal-user-title">Create User</h2>
+        <button class="modal-close" onclick="Modal.close('modal-user')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="user-form">
+          <input type="hidden" id="user-id">
+          <div class="form-group">
+            <label class="form-label">First Name *</label>
+            <input type="text" id="user-first-name" class="form-input" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Last Name *</label>
+            <input type="text" id="user-last-name" class="form-input" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email *</label>
+            <input type="email" id="user-email" class="form-input" required>
+          </div>
+          <div class="form-group" id="password-group">
+            <label class="form-label">Password *</label>
+            <input type="password" id="user-password" class="form-input" minlength="8">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Role</label>
+            <select id="user-role" class="form-input">
+              <option value="user">User</option>
+              <option value="manager">Manager</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="Modal.close('modal-user')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveUser()">Save</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- View User Modal -->
+  <div class="modal-overlay" id="modal-view-user">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title">User Details</h2>
+        <button class="modal-close" onclick="Modal.close('modal-view-user')">&times;</button>
+      </div>
+      <div class="modal-body" id="view-user-content"></div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="Modal.close('modal-view-user')">Close</button>
+      </div>
+    </div>
+  </div>
+  
+  <div id="toast-container" class="toast-container"></div>
+  
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/components/toast.js"></script>
+  <script src="js/components/modal.js"></script>
+  <script src="js/components/dropdown.js"></script>
+  <script src="js/components/datatable.js"></script>
+  <script>
+    let usersTable;
+    let currentCompanyId;
+    
+    function toggleSidebar() {
+      document.querySelector('.sidebar').classList.toggle('open');
+      document.querySelector('.sidebar-overlay').classList.toggle('active');
+    }
+    
+    function closeSidebar() {
+      document.querySelector('.sidebar').classList.remove('open');
+      document.querySelector('.sidebar-overlay').classList.remove('active');
+    }
+    
+    async function loadUsers() {
+      const company = Auth.getActiveCompany();
+      if (!company) {
+        Toast.warning('Please select a company first');
+        return;
+      }
+      currentCompanyId = company.id;
+      
+      usersTable = new DataTable('#users-table', {
+        columns: [
+          { key: 'name', label: 'Name', render: (v, row) => `
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div class="avatar avatar-sm avatar-placeholder">${Utils.getInitials(row.first_name + ' ' + row.last_name)}</div>
+              <div>
+                <div style="font-weight: 500;">${row.first_name} ${row.last_name}</div>
+                <div class="text-muted" style="font-size: 12px;">${row.email}</div>
+              </div>
+            </div>
+          `},
+          { key: 'role', label: 'Role', render: (v) => {
+            const colors = { admin: 'primary', manager: 'warning', user: 'gray' };
+            return `<span class="badge badge-${colors[v] || 'gray'}">${Utils.capitalize(v)}</span>`;
+          }},
+          { key: 'is_active', label: 'Status', render: (v) => 
+            `<span class="badge badge-${v ? 'success' : 'danger'}">${v ? 'Active' : 'Inactive'}</span>`
+          },
+          { key: 'last_login', label: 'Last Login', render: (v) => v ? Utils.formatDate(v, 'relative') : 'Never' },
+          { key: 'actions', label: 'Actions', render: (v, row) => `
+            <div style="display: flex; gap: 8px;">
+              <button class="btn btn-sm btn-secondary" onclick="viewUser(${row.id})">👁️</button>
+              <button class="btn btn-sm btn-secondary admin-only" onclick="editUser(${row.id})">✏️</button>
+              <button class="btn btn-sm btn-danger admin-only" onclick="deleteUser(${row.id})">🗑️</button>
+            </div>
+          `}
+        ],
+        perPage: 10,
+        searchable: true,
+        emptyMessage: 'No users found'
+      });
+      
+      usersTable.setLoading(true);
+      
+      try {
+        const response = await API.users.list(currentCompanyId);
+        if (response.success && response.data) {
+          usersTable.setData(response.data);
+        }
+      } catch (error) {
+        Toast.error('Failed to load users');
+        usersTable.setData([]);
+      }
+      
+      Auth.applyRoleVisibility();
+    }
+    
+    function openCreateModal() {
+      document.getElementById('modal-user-title').textContent = 'Create User';
+      document.getElementById('user-form').reset();
+      document.getElementById('user-id').value = '';
+      document.getElementById('password-group').style.display = 'block';
+      document.getElementById('user-password').required = true;
+      Modal.open('modal-user');
+    }
+    
+    async function editUser(id) {
+      const user = usersTable.data.find(u => u.id === id);
+      if (!user) return;
+      
+      document.getElementById('modal-user-title').textContent = 'Edit User';
+      document.getElementById('user-id').value = user.id;
+      document.getElementById('user-first-name').value = user.first_name;
+      document.getElementById('user-last-name').value = user.last_name;
+      document.getElementById('user-email').value = user.email;
+      document.getElementById('user-role').value = user.role;
+      document.getElementById('password-group').style.display = 'none';
+      document.getElementById('user-password').required = false;
+      Modal.open('modal-user');
+    }
+    
+    async function saveUser() {
+      const id = document.getElementById('user-id').value;
+      const data = {
+        first_name: document.getElementById('user-first-name').value,
+        last_name: document.getElementById('user-last-name').value,
+        email: document.getElementById('user-email').value,
+        role: document.getElementById('user-role').value
+      };
+      
+      if (!id) {
+        data.password = document.getElementById('user-password').value;
+        if (!data.password || data.password.length < 8) {
+          Toast.error('Password must be at least 8 characters');
+          return;
+        }
+      }
+      
+      try {
+        if (id) {
+          await API.users.update(currentCompanyId, id, data);
+          Toast.success('User updated successfully');
+        } else {
+          await API.users.create(currentCompanyId, data);
+          Toast.success('User created successfully');
+        }
+        Modal.close('modal-user');
+        loadUsers();
+      } catch (error) {
+        Toast.error(error.detail || 'Failed to save user');
+      }
+    }
+    
+    function viewUser(id) {
+      const user = usersTable.data.find(u => u.id === id);
+      if (!user) return;
+      
+      document.getElementById('view-user-content').innerHTML = `
+        <div style="text-align: center; margin-bottom: 24px;">
+          <div class="avatar avatar-xl avatar-placeholder" style="margin: 0 auto 12px;">
+            ${Utils.getInitials(user.first_name + ' ' + user.last_name)}
+          </div>
+          <h3>${user.first_name} ${user.last_name}</h3>
+          <p class="text-muted">${user.email}</p>
+        </div>
+        <div style="display: grid; gap: 12px;">
+          <div><strong>Role:</strong> <span class="badge badge-primary">${Utils.capitalize(user.role)}</span></div>
+          <div><strong>Status:</strong> <span class="badge badge-${user.is_active ? 'success' : 'danger'}">${user.is_active ? 'Active' : 'Inactive'}</span></div>
+          <div><strong>Last Login:</strong> ${user.last_login ? Utils.formatDate(user.last_login, 'long') : 'Never'}</div>
+          <div><strong>Created:</strong> ${Utils.formatDate(user.created_at, 'long')}</div>
+        </div>
+      `;
+      Modal.open('modal-view-user');
+    }
+    
+    function deleteUser(id) {
+      const user = usersTable.data.find(u => u.id === id);
+      if (!user) return;
+      
+      Modal.confirm({
+        title: 'Delete User',
+        message: `Are you sure you want to delete "${user.first_name} ${user.last_name}"?`,
+        confirmText: 'Delete',
+        confirmClass: 'btn-danger',
+        onConfirm: async () => {
+          try {
+            await API.users.delete(currentCompanyId, id);
+            Toast.success('User deleted successfully');
+            loadUsers();
+          } catch (error) {
+            Toast.error('Failed to delete user');
+          }
+        }
+      });
+    }
+    
+    document.addEventListener('DOMContentLoaded', loadUsers);
+  </script>
+</body>
+</html>

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile - Application Starter Kit</title>
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <style>
+    .profile-header { display: flex; align-items: center; gap: 24px; margin-bottom: 32px; flex-wrap: wrap; }
+    .profile-avatar { width: 100px; height: 100px; border-radius: 50%; background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 36px; font-weight: bold; }
+    .profile-info h2 { margin-bottom: 4px; }
+    .section-title { font-size: 18px; font-weight: 600; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+    .profile-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
+  </style>
+</head>
+<body>
+  <div class="app-container" data-role="user">
+    <header class="mobile-header">
+      <button class="hamburger" onclick="toggleSidebar()">☰</button>
+      <div class="mobile-header-title">Profile</div>
+      <div style="width: 40px;"></div>
+    </header>
+    
+    <div class="sidebar-overlay" onclick="closeSidebar()"></div>
+    
+    <aside class="sidebar">
+      <div class="sidebar-logo">🚀 App Starter Kit</div>
+      <nav>
+        <ul class="sidebar-nav">
+          <li><a href="dashboard.html">📊 Dashboard</a></li>
+          <li><a href="users.html">👥 Users</a></li>
+          <li><a href="companies.html" class="admin-only">🏢 Companies</a></li>
+          <li><a href="audit.html">📋 Audit Trail</a></li>
+          <li><a href="profile.html" class="active">👤 Profile</a></li>
+        </ul>
+      </nav>
+      <div style="position: absolute; bottom: 20px; left: 0; right: 0; padding: 0 20px;">
+        <button class="btn btn-secondary" style="width: 100%;" onclick="Auth.logout()">🚪 Logout</button>
+      </div>
+    </aside>
+    
+    <main class="main-content">
+      <div class="page-header">
+        <h1>My Profile</h1>
+        <p>Manage your account settings</p>
+      </div>
+      
+      <div class="profile-header">
+        <div class="profile-avatar" id="profile-avatar">JD</div>
+        <div class="profile-info">
+          <h2 id="profile-name">John Doe</h2>
+          <p class="text-muted" id="profile-email">john@example.com</p>
+          <span class="badge badge-primary" id="profile-role">User</span>
+        </div>
+      </div>
+      
+      <div class="profile-grid">
+        <div class="card">
+          <h3 class="section-title">Personal Information</h3>
+          <form id="profile-form">
+            <div class="form-group">
+              <label class="form-label">First Name</label>
+              <input type="text" id="first-name" class="form-input" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Last Name</label>
+              <input type="text" id="last-name" class="form-input" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input type="email" id="email" class="form-input" disabled>
+              <span class="form-hint">Email cannot be changed</span>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Phone</label>
+              <input type="tel" id="phone" class="form-input" placeholder="+91 9876543210">
+            </div>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+          </form>
+        </div>
+        
+        <div class="card">
+          <h3 class="section-title">Security</h3>
+          <form id="password-form">
+            <div class="form-group">
+              <label class="form-label">Current Password</label>
+              <input type="password" id="current-password" class="form-input" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">New Password</label>
+              <input type="password" id="new-password" class="form-input" required minlength="8">
+              <span class="form-hint">Minimum 8 characters</span>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Confirm New Password</label>
+              <input type="password" id="confirm-password" class="form-input" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Change Password</button>
+          </form>
+        </div>
+      </div>
+      
+      <div class="card mt-4">
+        <h3 class="section-title">Account Information</h3>
+        <div style="display: grid; gap: 12px;">
+          <div><strong>Member Since:</strong> <span id="member-since">-</span></div>
+          <div><strong>Last Login:</strong> <span id="last-login">-</span></div>
+          <div><strong>Active Company:</strong> <span id="active-company">-</span></div>
+        </div>
+      </div>
+    </main>
+  </div>
+  
+  <div id="toast-container" class="toast-container"></div>
+  
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/components/toast.js"></script>
+  <script>
+    function toggleSidebar() {
+      document.querySelector('.sidebar').classList.toggle('open');
+      document.querySelector('.sidebar-overlay').classList.toggle('active');
+    }
+    
+    function closeSidebar() {
+      document.querySelector('.sidebar').classList.remove('open');
+      document.querySelector('.sidebar-overlay').classList.remove('active');
+    }
+    
+    async function loadProfile() {
+      const user = Auth.getUser();
+      if (!user) return;
+      
+      const fullName = `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'User';
+      document.getElementById('profile-avatar').textContent = Utils.getInitials(fullName);
+      document.getElementById('profile-name').textContent = fullName;
+      document.getElementById('profile-email').textContent = user.email || '';
+      document.getElementById('profile-role').textContent = Utils.capitalize(user.role || 'user');
+      
+      document.getElementById('first-name').value = user.first_name || '';
+      document.getElementById('last-name').value = user.last_name || '';
+      document.getElementById('email').value = user.email || '';
+      document.getElementById('phone').value = user.phone || '';
+      
+      document.getElementById('member-since').textContent = user.created_at ? Utils.formatDate(user.created_at) : '-';
+      document.getElementById('last-login').textContent = user.last_login ? Utils.formatDate(user.last_login, 'long') : 'Current session';
+      
+      const company = Auth.getActiveCompany();
+      document.getElementById('active-company').textContent = company ? company.name : 'None selected';
+    }
+    
+    document.getElementById('profile-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const data = {
+        first_name: document.getElementById('first-name').value,
+        last_name: document.getElementById('last-name').value,
+        phone: document.getElementById('phone').value
+      };
+      
+      try {
+        const response = await API.put('/auth/profile', data);
+        if (response.success) {
+          const user = Auth.getUser();
+          Auth.setUser({ ...user, ...data });
+          Toast.success('Profile updated successfully');
+          loadProfile();
+        }
+      } catch (error) {
+        Toast.error(error.detail || 'Failed to update profile');
+      }
+    });
+    
+    document.getElementById('password-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const currentPassword = document.getElementById('current-password').value;
+      const newPassword = document.getElementById('new-password').value;
+      const confirmPassword = document.getElementById('confirm-password').value;
+      
+      if (newPassword !== confirmPassword) {
+        Toast.error('New passwords do not match');
+        return;
+      }
+      
+      const validation = Utils.validatePassword(newPassword);
+      if (!validation.valid) {
+        Toast.error('Password too weak: ' + validation.errors.join(', '));
+        return;
+      }
+      
+      try {
+        await API.auth.changePassword({
+          current_password: currentPassword,
+          new_password: newPassword
+        });
+        Toast.success('Password changed successfully');
+        document.getElementById('password-form').reset();
+      } catch (error) {
+        Toast.error(error.detail || 'Failed to change password');
+      }
+    });
+    
+    document.addEventListener('DOMContentLoaded', loadProfile);
+  </script>
+</body>
+</html>

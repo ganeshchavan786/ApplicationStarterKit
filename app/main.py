@@ -9,11 +9,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
+import os
 from fastapi.exceptions import RequestValidationError
 from sqlalchemy.exc import SQLAlchemyError
 from app.config import settings
 from app.database import engine, Base, get_db_info
-from app.routes import auth, company, user, permission
+from app.routes import auth, company, user, permission, email
 from app.middleware import (
     RequestContextMiddleware,
     RateLimiterMiddleware,
@@ -176,6 +178,7 @@ app.include_router(auth.router, prefix=f"{API_V1_PREFIX}/auth", tags=["v1 - Auth
 app.include_router(company.router, prefix=f"{API_V1_PREFIX}/companies", tags=["v1 - Companies"])
 app.include_router(user.router, prefix=f"{API_V1_PREFIX}/companies", tags=["v1 - Users"])
 app.include_router(permission.router, prefix=API_V1_PREFIX, tags=["v1 - Permissions"])
+app.include_router(email.router, prefix=f"{API_V1_PREFIX}/email", tags=["v1 - Email Operations"])
 
 # Legacy routes (backward compatibility) - will be deprecated
 LEGACY_PREFIX = "/api"
@@ -183,6 +186,13 @@ app.include_router(auth.router, prefix=f"{LEGACY_PREFIX}/auth", tags=["Legacy - 
 app.include_router(company.router, prefix=f"{LEGACY_PREFIX}/companies", tags=["Legacy"], include_in_schema=False)
 app.include_router(user.router, prefix=f"{LEGACY_PREFIX}/companies", tags=["Legacy"], include_in_schema=False)
 app.include_router(permission.router, prefix=LEGACY_PREFIX, tags=["Legacy"], include_in_schema=False)
+
+
+# ==================== STATIC FILES (Frontend) ====================
+# Mount frontend static files
+frontend_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "frontend")
+if os.path.exists(frontend_path):
+    app.mount("/frontend", StaticFiles(directory=frontend_path, html=True), name="frontend")
 
 
 # Startup event

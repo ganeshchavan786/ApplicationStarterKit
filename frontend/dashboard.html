@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#2563eb">
+  <title>Dashboard - Application Starter Kit</title>
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/advanced.css">
+  <script src="js/lib/chart.min.js"></script>
+</head>
+<body>
+  <div class="offline-banner" id="offline-banner">⚠️ You are offline</div>
+  
+  <div class="app-container" data-role="user">
+    <header class="mobile-header">
+      <button class="hamburger" onclick="toggleSidebar()">☰</button>
+      <div class="mobile-header-title">Dashboard</div>
+      <div style="width: 40px;"></div>
+    </header>
+    
+    <div class="sidebar-overlay" onclick="closeSidebar()"></div>
+    
+    <aside class="sidebar">
+      <div class="sidebar-logo">🚀 App Starter Kit</div>
+      <nav>
+        <ul class="sidebar-nav">
+          <li><a href="dashboard.html" class="active">📊 Dashboard</a></li>
+          <li><a href="users.html">👥 Users</a></li>
+          <li><a href="companies.html" class="admin-only">🏢 Companies</a></li>
+          <li><a href="audit.html">📋 Audit Trail</a></li>
+          <li><a href="profile.html">👤 Profile</a></li>
+        </ul>
+      </nav>
+      <div style="position: absolute; bottom: 20px; left: 0; right: 0; padding: 0 20px;">
+        <button class="btn btn-secondary" style="width: 100%;" onclick="logout()">🚪 Logout</button>
+      </div>
+    </aside>
+    
+    <main class="main-content">
+      <div class="page-header">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+          <div>
+            <h1>Dashboard</h1>
+            <p>Welcome back, <span id="user-name">User</span>!</p>
+          </div>
+          <div class="dropdown" id="company-dropdown">
+            <button class="dropdown-toggle">
+              <span id="active-company">Select Company</span> ▼
+            </button>
+            <div class="dropdown-menu" id="company-list"></div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="grid grid-auto">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Total Users</span>
+            <span class="badge badge-info">Company</span>
+          </div>
+          <div class="card-metric" id="metric-users"><div class="skeleton skeleton-metric"></div></div>
+          <div class="card-label">Active in this company</div>
+        </div>
+        
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Companies</span>
+            <span class="badge badge-success">All</span>
+          </div>
+          <div class="card-metric" id="metric-companies"><div class="skeleton skeleton-metric"></div></div>
+          <div class="card-label">You have access to</div>
+        </div>
+        
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Audit Logs</span>
+            <span class="badge badge-warning">Today</span>
+          </div>
+          <div class="card-metric" id="metric-audits"><div class="skeleton skeleton-metric"></div></div>
+          <div class="card-label">Actions recorded</div>
+        </div>
+      </div>
+      
+      <!-- Charts Section -->
+      <div class="grid" style="grid-template-columns: 2fr 1fr; gap: 24px; margin-top: 24px;">
+        <div class="chart-container animate-fadeInUp">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">User Activity Trend</div>
+              <div class="chart-subtitle">Last 7 days</div>
+            </div>
+            <div class="tabs-pills" style="display: inline-flex;">
+              <button class="tab active" onclick="updateChart('week')">Week</button>
+              <button class="tab" onclick="updateChart('month')">Month</button>
+            </div>
+          </div>
+          <div class="chart-wrapper">
+            <canvas id="activityChart"></canvas>
+          </div>
+        </div>
+        
+        <div class="chart-container animate-fadeInUp stagger-1">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">Users by Role</div>
+              <div class="chart-subtitle">Distribution</div>
+            </div>
+          </div>
+          <div class="chart-wrapper-sm">
+            <canvas id="roleChart"></canvas>
+          </div>
+          <div style="margin-top: 16px;">
+            <div class="progress-labeled">
+              <span style="font-size: 13px;">Admin</span>
+              <div class="progress"><div class="progress-bar" style="width: 15%;"></div></div>
+              <span class="progress-value">15%</span>
+            </div>
+            <div class="progress-labeled" style="margin-top: 8px;">
+              <span style="font-size: 13px;">Manager</span>
+              <div class="progress"><div class="progress-bar success" style="width: 35%;"></div></div>
+              <span class="progress-value">35%</span>
+            </div>
+            <div class="progress-labeled" style="margin-top: 8px;">
+              <span style="font-size: 13px;">User</span>
+              <div class="progress"><div class="progress-bar info" style="width: 50%;"></div></div>
+              <span class="progress-value">50%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 24px;">
+        <!-- Recent Activity -->
+        <div class="card animate-fadeInUp stagger-2">
+          <div class="card-header">
+            <h3 class="card-title">Recent Activity</h3>
+            <button class="btn btn-sm btn-secondary" onclick="loadActivity()">🔄 Refresh</button>
+          </div>
+          <div id="activity-feed">
+            <div class="skeleton skeleton-text" style="width: 80%;"></div>
+            <div class="skeleton skeleton-text" style="width: 60%;"></div>
+            <div class="skeleton skeleton-text" style="width: 70%;"></div>
+          </div>
+        </div>
+        
+        <!-- Performance Chart -->
+        <div class="chart-container animate-fadeInUp stagger-3">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">System Performance</div>
+              <div class="chart-subtitle">API Response Times</div>
+            </div>
+          </div>
+          <div class="chart-wrapper-sm">
+            <canvas id="performanceChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  
+  <div id="toast-container" class="toast-container"></div>
+  
+  <!-- No Company Modal -->
+  <div class="modal-overlay" id="no-company-modal">
+    <div class="modal" style="max-width: 500px;">
+      <div class="modal-header">
+        <h3>🏢 Welcome! Create Your First Company</h3>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-info" style="margin-bottom: 20px;">
+          <span class="alert-icon">ℹ️</span>
+          <div class="alert-content">
+            <div class="alert-message">You need at least one company to manage users, audit trails, and other features.</div>
+          </div>
+        </div>
+        <form id="create-company-form">
+          <div class="form-group">
+            <label class="form-label">Company Name *</label>
+            <input type="text" id="new-company-name" class="form-input" placeholder="Enter company name" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Company Email *</label>
+            <input type="email" id="new-company-email" class="form-input" placeholder="company@example.com" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phone (Optional)</label>
+            <input type="tel" id="new-company-phone" class="form-input" placeholder="+91 9876543210">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Address (Optional)</label>
+            <textarea id="new-company-address" class="form-input" rows="2" placeholder="Company address"></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" onclick="createFirstCompany()">🚀 Create Company & Continue</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Select Company Modal (when redirected from other pages) -->
+  <div class="modal-overlay" id="select-company-modal">
+    <div class="modal" style="max-width: 450px;">
+      <div class="modal-header">
+        <h3>🏢 Select a Company</h3>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-warning" style="margin-bottom: 20px;">
+          <span class="alert-icon">⚠️</span>
+          <div class="alert-content">
+            <div class="alert-message">Please select a company to continue. Each company has its own users and data.</div>
+          </div>
+        </div>
+        <div id="company-select-list" style="max-height: 300px; overflow-y: auto;">
+          <!-- Companies will be loaded here -->
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/components/toast.js"></script>
+  <script src="js/components/dropdown.js"></script>
+  <script src="js/components/charts.js"></script>
+  <script>
+    let activityChart, roleChart, performanceChart;
+    
+    function toggleSidebar() {
+      document.querySelector('.sidebar').classList.toggle('open');
+      document.querySelector('.sidebar-overlay').classList.toggle('active');
+    }
+    
+    function closeSidebar() {
+      document.querySelector('.sidebar').classList.remove('open');
+      document.querySelector('.sidebar-overlay').classList.remove('active');
+    }
+    
+    function logout() {
+      Auth.logout();
+    }
+    
+    async function loadDashboard() {
+      const user = Auth.getUser();
+      if (user) {
+        document.getElementById('user-name').textContent = user.first_name || user.email || 'User';
+      }
+      
+      // Check URL params for company selection redirect
+      const urlParams = new URLSearchParams(window.location.search);
+      const needsCompanySelect = urlParams.get('selectCompany') === 'true';
+      
+      let companies = [];
+      try {
+        const companiesRes = await API.companies.list();
+        if (companiesRes.success && companiesRes.data) {
+          companies = companiesRes.data;
+        }
+      } catch (e) {
+        // API error - might not be logged in or server issue
+        companies = [];
+      }
+      
+      document.getElementById('metric-companies').textContent = companies.length || 0;
+      
+      // FLOW: No companies exist → Show Create Company Modal
+      if (companies.length === 0) {
+        showNoCompanyModal();
+        return;
+      }
+      
+      // Populate company dropdown
+      const companyList = document.getElementById('company-list');
+      companyList.innerHTML = companies.map(c => 
+        `<a href="#" class="dropdown-item" onclick="selectCompany(${c.id}, '${c.name}', '${c.user_role || 'user'}')">${c.name}</a>`
+      ).join('');
+      
+      // FLOW: Redirected from other page → Show Select Company Modal
+      if (needsCompanySelect && !Auth.getActiveCompany()) {
+        showSelectCompanyModal(companies);
+        return;
+      }
+      
+      // Set active company
+      const activeCompany = Auth.getActiveCompany();
+      if (activeCompany) {
+        document.getElementById('active-company').textContent = activeCompany.name;
+      } else if (companies.length > 0) {
+        // Auto-select first company
+        selectCompany(companies[0].id, companies[0].name, companies[0].user_role || 'user');
+      }
+      
+      document.getElementById('metric-users').textContent = Math.floor(Math.random() * 50) + 10;
+      document.getElementById('metric-audits').textContent = Math.floor(Math.random() * 100) + 20;
+      
+      loadActivity();
+      initCharts();
+    }
+    
+    function showNoCompanyModal() {
+      document.getElementById('no-company-modal').classList.add('active');
+    }
+    
+    function showSelectCompanyModal(companies) {
+      const list = document.getElementById('company-select-list');
+      list.innerHTML = companies.map(c => `
+        <div class="card hover-lift" style="padding: 16px; margin-bottom: 12px; cursor: pointer;" 
+             onclick="selectCompanyFromModal(${c.id}, '${c.name}', '${c.user_role || 'user'}')">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="width: 48px; height: 48px; background: var(--primary-light); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px;">🏢</div>
+            <div>
+              <div style="font-weight: 600;">${c.name}</div>
+              <div class="text-muted" style="font-size: 13px;">Role: ${c.user_role || 'User'}</div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+      document.getElementById('select-company-modal').classList.add('active');
+    }
+    
+    function selectCompanyFromModal(id, name, role) {
+      document.getElementById('select-company-modal').classList.remove('active');
+      selectCompany(id, name, role);
+      
+      // Reload dashboard with company data
+      document.getElementById('metric-users').textContent = Math.floor(Math.random() * 50) + 10;
+      document.getElementById('metric-audits').textContent = Math.floor(Math.random() * 100) + 20;
+      loadActivity();
+      initCharts();
+    }
+    
+    async function createFirstCompany() {
+      const name = document.getElementById('new-company-name').value.trim();
+      const email = document.getElementById('new-company-email').value.trim();
+      const phone = document.getElementById('new-company-phone').value.trim();
+      const address = document.getElementById('new-company-address').value.trim();
+      
+      if (!name) {
+        Toast.error('Please enter a company name');
+        return;
+      }
+      
+      if (!email) {
+        Toast.error('Please enter a company email');
+        return;
+      }
+      
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        Toast.error('Please enter a valid email address');
+        return;
+      }
+      
+      const companyData = { name, email };
+      if (phone) companyData.phone = phone;
+      if (address) companyData.address = address;
+      
+      try {
+        const response = await API.companies.create(companyData);
+        if (response.success && response.data) {
+          Toast.success('Company created successfully!');
+          document.getElementById('no-company-modal').classList.remove('active');
+          
+          // Select the new company and reload
+          selectCompany(response.data.id, response.data.name, 'admin');
+          
+          // Reload dashboard
+          setTimeout(() => {
+            window.location.reload();
+          }, 500);
+        } else {
+          Toast.error(response.message || 'Failed to create company');
+        }
+      } catch (e) {
+        console.error('Create company error:', e);
+        Toast.error(e.detail || e.message || 'Error creating company. Please try again.');
+      }
+    }
+    
+    function selectCompany(id, name, role = 'user', permissions = []) {
+      Auth.setActiveCompany({ id, name, role, permissions });
+      document.getElementById('active-company').textContent = name;
+      Toast.success(`Switched to ${name}`);
+      Dropdown.closeAll();
+      
+      // Check if there's a pending redirect
+      const redirectUrl = sessionStorage.getItem('redirect_after_company');
+      if (redirectUrl) {
+        sessionStorage.removeItem('redirect_after_company');
+        setTimeout(() => {
+          window.location.href = redirectUrl;
+        }, 500);
+      }
+    }
+    
+    function loadActivity() {
+      const activities = [
+        { action: 'User login', user: 'admin@test.com', time: '2 minutes ago', icon: '🔐' },
+        { action: 'Company updated', user: 'manager@test.com', time: '15 minutes ago', icon: '🏢' },
+        { action: 'New user created', user: 'admin@test.com', time: '1 hour ago', icon: '👤' },
+        { action: 'Password changed', user: 'user@test.com', time: '3 hours ago', icon: '🔑' },
+        { action: 'Role updated', user: 'admin@test.com', time: '5 hours ago', icon: '🛡️' }
+      ];
+      
+      document.getElementById('activity-feed').innerHTML = activities.map(a => `
+        <div class="timeline-item" style="padding: 12px 0; border-bottom: 1px solid var(--border);">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="font-size: 20px;">${a.icon}</span>
+            <div style="flex: 1;">
+              <strong>${a.action}</strong>
+              <div class="text-muted" style="font-size: 13px;">${a.user}</div>
+            </div>
+            <div class="text-muted" style="font-size: 12px;">${a.time}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+    
+    function initCharts() {
+      // Activity Line Chart
+      activityChart = Charts.line('activityChart', {
+        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        datasets: [
+          { label: 'Logins', data: [65, 78, 90, 81, 95, 55, 40], color: '#2563eb', fill: true },
+          { label: 'Actions', data: [28, 48, 40, 59, 86, 27, 20], color: '#10b981' }
+        ]
+      });
+      
+      // Role Doughnut Chart
+      roleChart = Charts.doughnut('roleChart', {
+        labels: ['Admin', 'Manager', 'User'],
+        values: [15, 35, 50],
+        colors: ['#2563eb', '#10b981', '#3b82f6']
+      });
+      
+      // Performance Bar Chart
+      performanceChart = Charts.bar('performanceChart', {
+        labels: ['Auth', 'Users', 'Companies', 'Audit', 'Profile'],
+        datasets: [{
+          label: 'Avg Response (ms)',
+          data: [45, 120, 85, 150, 65],
+          colors: ['#2563eb', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6']
+        }]
+      });
+    }
+    
+    function updateChart(period) {
+      document.querySelectorAll('.tabs-pills .tab').forEach(t => t.classList.remove('active'));
+      event.target.classList.add('active');
+      
+      const data = period === 'week' 
+        ? { labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], logins: [65, 78, 90, 81, 95, 55, 40], actions: [28, 48, 40, 59, 86, 27, 20] }
+        : { labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'], logins: [320, 450, 380, 520], actions: [180, 290, 220, 350] };
+      
+      Charts.update(activityChart, {
+        labels: data.labels,
+        datasets: [{ data: data.logins }, { data: data.actions }]
+      });
+    }
+    
+    window.addEventListener('online', () => document.getElementById('offline-banner').classList.remove('show'));
+    window.addEventListener('offline', () => document.getElementById('offline-banner').classList.add('show'));
+    
+    document.addEventListener('DOMContentLoaded', loadDashboard);
+  </script>
+</body>
+</html>
