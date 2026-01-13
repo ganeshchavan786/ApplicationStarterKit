@@ -31,7 +31,7 @@ class Settings(BaseSettings):
     ALLOWED_HOSTS: List[str] = ["localhost", "127.0.0.1", "0.0.0.0", "*"]
     
     # CORS - stored as string, parsed to list
-    ALLOWED_ORIGINS: str = "http://localhost:3000,http://localhost:8000,http://localhost:8080"
+    ALLOWED_ORIGINS: str = "http://localhost:3000,http://localhost:8000,http://localhost:8080,http://localhost:8901,http://127.0.0.1:8901"
     
     @property
     def allowed_origins_list(self) -> List[str]:

@@ -1,0 +1,1537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Forms Library - Pure Vanilla JS</title>
+  <style>
+    /* ============================================
+       DESIGN TOKENS
+       ============================================ */
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --primary-light: #dbeafe;
+      --success: #16a34a;
+      --success-light: #dcfce7;
+      --danger: #dc2626;
+      --danger-light: #fee2e2;
+      --warning: #f59e0b;
+      --info: #0ea5e9;
+      
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-300: #d1d5db;
+      --gray-500: #6b7280;
+      --gray-700: #374151;
+      --gray-900: #111827;
+      
+      --radius: 8px;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-6: 24px;
+      --space-8: 32px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--gray-50);
+      color: var(--gray-900);
+      line-height: 1.6;
+    }
+
+    /* ============================================
+       LAYOUT
+       ============================================ */
+    .navbar {
+      background: white;
+      border-bottom: 1px solid var(--gray-200);
+      padding: var(--space-4) var(--space-6);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .navbar-brand {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: var(--space-8) var(--space-6);
+    }
+
+    .section {
+      margin-bottom: var(--space-8);
+    }
+
+    .section-title {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: var(--space-6);
+    }
+
+    .grid {
+      display: grid;
+      gap: var(--space-6);
+    }
+
+    .grid-2 { grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); }
+
+    /* ============================================
+       FORM CONTROLS
+       ============================================ */
+    .form-group {
+      margin-bottom: var(--space-4);
+    }
+
+    .form-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: var(--space-2);
+      color: var(--gray-700);
+    }
+
+    .form-label.required::after {
+      content: " *";
+      color: var(--danger);
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 10px 14px;
+      font-size: 14px;
+      border: 1px solid var(--gray-300);
+      border-radius: var(--radius);
+      background: white;
+      color: var(--gray-900);
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-light);
+    }
+
+    .form-control::placeholder {
+      color: var(--gray-500);
+    }
+
+    .form-control:disabled {
+      background: var(--gray-100);
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    /* Sizes */
+    .form-control-sm {
+      padding: 6px 10px;
+      font-size: 13px;
+    }
+
+    .form-control-lg {
+      padding: 14px 18px;
+      font-size: 16px;
+    }
+
+    /* Textarea */
+    textarea.form-control {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    /* Select */
+    select.form-control {
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 36px;
+    }
+
+    /* File Input */
+    input[type="file"].form-control {
+      padding: 8px 12px;
+      cursor: pointer;
+    }
+
+    /* Range Input */
+    .form-range {
+      width: 100%;
+      height: 6px;
+      background: var(--gray-200);
+      border-radius: 3px;
+      outline: none;
+      -webkit-appearance: none;
+    }
+
+    .form-range::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      background: var(--primary);
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    .form-range::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
+      background: var(--primary);
+      border-radius: 50%;
+      cursor: pointer;
+      border: none;
+    }
+
+    /* ============================================
+       CHECKBOX & RADIO
+       ============================================ */
+    .form-check {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      margin-bottom: var(--space-3);
+    }
+
+    .form-check-inline {
+      display: inline-flex;
+      margin-right: var(--space-4);
+    }
+
+    .form-check-input {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      accent-color: var(--primary);
+    }
+
+    .form-check-label {
+      font-size: 14px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    /* Custom Switch */
+    .form-switch {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      margin-bottom: var(--space-3);
+    }
+
+    .switch-input {
+      position: relative;
+      width: 48px;
+      height: 24px;
+      cursor: pointer;
+      appearance: none;
+      background: var(--gray-300);
+      border-radius: 12px;
+      transition: all 0.3s;
+    }
+
+    .switch-input:checked {
+      background: var(--primary);
+    }
+
+    .switch-input::before {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 20px;
+      height: 20px;
+      background: white;
+      border-radius: 50%;
+      transition: all 0.3s;
+    }
+
+    .switch-input:checked::before {
+      transform: translateX(24px);
+    }
+
+    .switch-input:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* ============================================
+       INPUT GROUP
+       ============================================ */
+    .input-group {
+      display: flex;
+      width: 100%;
+    }
+
+    .input-group .form-control {
+      border-radius: 0;
+    }
+
+    .input-group .form-control:first-child {
+      border-radius: var(--radius) 0 0 var(--radius);
+    }
+
+    .input-group .form-control:last-child {
+      border-radius: 0 var(--radius) var(--radius) 0;
+    }
+
+    .input-group-text {
+      display: flex;
+      align-items: center;
+      padding: 10px 14px;
+      font-size: 14px;
+      background: var(--gray-100);
+      border: 1px solid var(--gray-300);
+      color: var(--gray-700);
+      white-space: nowrap;
+    }
+
+    .input-group .input-group-text:first-child {
+      border-radius: var(--radius) 0 0 var(--radius);
+      border-right: none;
+    }
+
+    .input-group .input-group-text:last-child {
+      border-radius: 0 var(--radius) var(--radius) 0;
+      border-left: none;
+    }
+
+    /* ============================================
+       VALIDATION STATES
+       ============================================ */
+    .form-control.is-valid {
+      border-color: var(--success);
+    }
+
+    .form-control.is-valid:focus {
+      box-shadow: 0 0 0 3px var(--success-light);
+    }
+
+    .form-control.is-invalid {
+      border-color: var(--danger);
+    }
+
+    .form-control.is-invalid:focus {
+      box-shadow: 0 0 0 3px var(--danger-light);
+    }
+
+    .valid-feedback,
+    .invalid-feedback {
+      display: none;
+      font-size: 13px;
+      margin-top: var(--space-2);
+    }
+
+    .valid-feedback {
+      color: var(--success);
+    }
+
+    .invalid-feedback {
+      color: var(--danger);
+    }
+
+    .form-control.is-valid ~ .valid-feedback {
+      display: block;
+    }
+
+    .form-control.is-invalid ~ .invalid-feedback {
+      display: block;
+    }
+
+    .form-text {
+      display: block;
+      font-size: 13px;
+      color: var(--gray-500);
+      margin-top: var(--space-2);
+    }
+
+    /* ============================================
+       FORM WIZARDS
+       ============================================ */
+    .wizard-container {
+      background: white;
+      border-radius: var(--radius);
+      border: 1px solid var(--gray-200);
+      overflow: hidden;
+    }
+
+    .wizard-nav {
+      display: flex;
+      background: var(--gray-50);
+      border-bottom: 1px solid var(--gray-200);
+      padding: 0;
+    }
+
+    .wizard-step {
+      flex: 1;
+      position: relative;
+      padding: var(--space-4);
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .wizard-step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 0;
+      height: 0;
+      border-left: 12px solid var(--gray-300);
+      border-top: 12px solid transparent;
+      border-bottom: 12px solid transparent;
+      z-index: 1;
+    }
+
+    .wizard-step.completed {
+      background: var(--success-light);
+      color: var(--success);
+    }
+
+    .wizard-step.completed::after {
+      border-left-color: var(--success-light);
+    }
+
+    .wizard-step.active {
+      background: var(--primary);
+      color: white;
+      font-weight: 600;
+    }
+
+    .wizard-step.active::after {
+      border-left-color: var(--primary);
+    }
+
+    .wizard-step.disabled {
+      color: var(--gray-500);
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    .wizard-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      background: white;
+      border-radius: 50%;
+      font-weight: 700;
+      margin-bottom: var(--space-2);
+    }
+
+    .wizard-step.completed .wizard-number {
+      background: var(--success);
+      color: white;
+    }
+
+    .wizard-step.active .wizard-number {
+      background: white;
+      color: var(--primary);
+    }
+
+    .wizard-label {
+      font-size: 13px;
+      display: block;
+    }
+
+    .wizard-content {
+      padding: var(--space-6);
+      min-height: 200px;
+    }
+
+    /* Wizard Style 2 - Simple Text */
+    .wizard-nav-2 {
+      display: flex;
+      background: white;
+      border-bottom: 2px solid var(--gray-200);
+      padding: 0;
+    }
+
+    .wizard-nav-2 .wizard-step {
+      flex: 1;
+      padding: var(--space-4);
+      text-align: center;
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .wizard-nav-2 .wizard-step.completed {
+      background: transparent;
+      color: var(--gray-700);
+      border-bottom-color: var(--success);
+    }
+
+    .wizard-nav-2 .wizard-step.active {
+      background: transparent;
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+      font-weight: 600;
+    }
+
+    .wizard-nav-2 .wizard-step::after {
+      display: none;
+    }
+
+    /* Wizard Style 3 - Dots */
+    .wizard-nav-3 {
+      display: flex;
+      background: white;
+      padding: var(--space-6);
+      position: relative;
+    }
+
+    .wizard-nav-3::before {
+      content: '';
+      position: absolute;
+      top: 45px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--gray-200);
+    }
+
+    .wizard-nav-3 .wizard-step {
+      flex: 1;
+      padding: var(--space-4);
+      text-align: center;
+      position: relative;
+      background: transparent;
+    }
+
+    .wizard-nav-3 .wizard-step::after {
+      display: none;
+    }
+
+    .wizard-dot {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: white;
+      border: 3px solid var(--gray-300);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto var(--space-2);
+      position: relative;
+      z-index: 1;
+      font-weight: 700;
+      font-size: 16px;
+      color: var(--gray-500);
+    }
+
+    .wizard-step.completed .wizard-dot {
+      background: var(--success);
+      border-color: var(--success);
+      color: white;
+    }
+
+    .wizard-step.completed .wizard-dot::after {
+      content: '✓';
+      font-size: 20px;
+    }
+
+    .wizard-step.active .wizard-dot {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: white;
+    }
+
+    .wizard-step-number {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--gray-500);
+      margin-bottom: var(--space-1);
+      display: block;
+    }
+
+    /* ============================================
+       ADVANCED FORM PLUGINS (Pure Vanilla)
+       ============================================ */
+    
+    /* Date Picker */
+    .datepicker-container {
+      position: relative;
+    }
+
+    .datepicker-icon {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--gray-500);
+      pointer-events: none;
+    }
+
+    /* Tags Input */
+    .tags-input-container {
+      border: 1px solid var(--gray-300);
+      border-radius: var(--radius);
+      padding: 6px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      min-height: 42px;
+      cursor: text;
+      transition: all 0.2s;
+    }
+
+    .tags-input-container:focus-within {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-light);
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      background: var(--primary-light);
+      color: var(--primary);
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .tag-remove {
+      cursor: pointer;
+      font-size: 16px;
+      line-height: 1;
+    }
+
+    .tags-input-container input {
+      border: none;
+      outline: none;
+      flex: 1;
+      min-width: 100px;
+      font-size: 14px;
+      padding: 4px;
+    }
+
+    /* Color Picker */
+    .color-picker-container {
+      display: flex;
+      gap: var(--space-3);
+      align-items: center;
+    }
+
+    .color-preview {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius);
+      border: 2px solid var(--gray-300);
+      cursor: pointer;
+    }
+
+    input[type="color"] {
+      width: 50px;
+      height: 40px;
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+    }
+
+    /* ============================================
+       UTILITIES
+       ============================================ */
+    .card {
+      background: white;
+      border-radius: var(--radius);
+      border: 1px solid var(--gray-200);
+      padding: var(--space-6);
+    }
+
+    .mb-3 { margin-bottom: var(--space-3); }
+    .mb-4 { margin-bottom: var(--space-4); }
+
+    @media (max-width: 768px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      
+      .wizard-nav {
+        flex-direction: column;
+      }
+      
+      .wizard-step::after {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-brand">📝 Forms Library - Pure Vanilla</div>
+  </nav>
+
+  <div class="container">
+
+    <!-- ============================================
+         1. BASIC FORM CONTROLS
+         ============================================ -->
+    <section class="section">
+      <h2 class="section-title">1. Form Controls</h2>
+      
+      <div class="grid grid-2">
+        <!-- Text Inputs -->
+        <div class="card">
+          <h3 style="margin-bottom: 20px;">Text Inputs</h3>
+          
+          <div class="form-group">
+            <label class="form-label required">Email Address</label>
+            <input type="email" class="form-control" placeholder="name@example.com">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Large Input</label>
+            <input type="text" class="form-control form-control-lg" placeholder="Large input">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Default Input</label>
+            <input type="text" class="form-control" placeholder="Default input">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Small Input</label>
+            <input type="text" class="form-control form-control-sm" placeholder="Small input">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Disabled Input</label>
+            <input type="text" class="form-control" placeholder="Disabled" disabled>
+          </div>
+        </div>
+
+        <!-- Textarea & Select -->
+        <div class="card">
+          <h3 style="margin-bottom: 20px;">Textarea & Select</h3>
+          
+          <div class="form-group">
+            <label class="form-label">Textarea</label>
+            <textarea class="form-control" rows="3" placeholder="Enter your message..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Select Dropdown</label>
+            <select class="form-control">
+              <option>Select an option</option>
+              <option value="1">Option 1</option>
+              <option value="2">Option 2</option>
+              <option value="3">Option 3</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Multiple Select</label>
+            <select class="form-control" multiple size="4">
+              <option>Option 1</option>
+              <option>Option 2</option>
+              <option>Option 3</option>
+              <option>Option 4</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================
+         2. CHECKBOX, RADIO & SWITCH
+         ============================================ -->
+    <section class="section">
+      <h2 class="section-title">2. Checkboxes, Radios & Switches</h2>
+      
+      <div class="grid grid-2">
+        <!-- Checkboxes -->
+        <div class="card">
+          <h3 style="margin-bottom: 20px;">Checkboxes</h3>
+          
+          <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="check1">
+            <label class="form-check-label" for="check1">Default checkbox</label>
+          </div>
+
+          <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="check2" checked>
+            <label class="form-check-label" for="check2">Checked checkbox</label>
+          </div>
+
+          <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="check3" disabled>
+            <label class="form-check-label" for="check3">Disabled checkbox</label>
+          </div>
+
+          <h4 style="margin: 20px 0 12px; font-size: 14px; font-weight: 600;">Inline Checkboxes</h4>
+          
+          <div class="form-check form-check-inline">
+            <input type="checkbox" class="form-check-input" id="check-inline1">
+            <label class="form-check-label" for="check-inline1">1</label>
+          </div>
+
+          <div class="form-check form-check-inline">
+            <input type="checkbox" class="form-check-input" id="check-inline2">
+            <label class="form-check-label" for="check-inline2">2</label>
+          </div>
+
+          <div class="form-check form-check-inline">
+            <input type="checkbox" class="form-check-input" id="check-inline3">
+            <label class="form-check-label" for="check-inline3">3</label>
+          </div>
+        </div>
+
+        <!-- Radios & Switches -->
+        <div class="card">
+          <h3 style="margin-bottom: 20px;">Radio Buttons</h3>
+          
+          <div class="form-check">
+            <input type="radio" class="form-check-input" name="radio1" id="radio1">
+            <label class="form-check-label" for="radio1">Default radio</label>
+          </div>
+
+          <div class="form-check">
+            <input type="radio" class="form-check-input" name="radio1" id="radio2" checked>
+            <label class="form-check-label" for="radio2">Checked radio</label>
+          </div>
+
+          <div class="form-check">
+            <input type="radio" class="form-check-input" name="radio1" id="radio3" disabled>
+            <label class="form-check-label" for="radio3">Disabled radio</label>
+          </div>
+
+          <h4 style="margin: 20px 0 12px; font-size: 14px; font-weight: 600;">Switches</h4>
+          
+          <div class="form-switch">
+            <input type="checkbox" class="switch-input" id="switch1">
+            <label class="form-check-label" for="switch1">Toggle this switch</label>
+          </div>
+
+          <div class="form-switch">
+            <input type="checkbox" class="switch-input" id="switch2" checked>
+            <label class="form-check-label" for="switch2">Checked switch</label>
+          </div>
+
+          <div class="form-switch">
+            <input type="checkbox" class="switch-input" id="switch3" disabled>
+            <label class="form-check-label" for="switch3">Disabled switch</label>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================
+         3. INPUT GROUPS & VALIDATION
+         ============================================ -->
+    <section class="section">
+      <h2 class="section-title">3. Input Groups & Validation</h2>
+      
+      <div class="grid grid-2">
+        <!-- Input Groups -->
+        <div class="card">
+          <h3 style="margin-bottom: 20px;">Input Groups</h3>
+          
+          <div class="form-group">
+            <label class="form-label">Username</label>
+            <div class="input-group">
+              <span class="input-group-text">@</span>
+              <input type="text" class="form-control" placeholder="Username">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Website</label>
+            <div class="input-group">
+              <input type="text" class="form-control" placeholder="yourdomain">
+              <span class="input-group-text">.com</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Amount</label>
+            <div class="input-group">
+              <span class="input-group-text">$</span>
+              <input type="text" class="form-control" placeholder="0.00">
+              <span class="input-group-text">.00</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Validation States -->
+        <div class="card">
+          <h3 style="margin-bottom: 20px;">Validation</h3>
+          
+          <div class="form-group">
+            <label class="form-label">Valid Input</label>
+            <input type="text" class="form-control is-valid" value="John Doe">
+            <div class="valid-feedback">✓ Looks good!</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Invalid Input</label>
+            <input type="text" class="form-control is-invalid" value="">
+            <div class="invalid-feedback">✗ This field is required</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <input type="password" class="form-control" id="password">
+            <div class="form-text">Must be 8-20 characters long</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================
+         4. RANGE & FILE INPUT
+         ============================================ -->
+    <section class="section">
+      <h2 class="section-title">4. Range & File Input</h2>
+      
+      <div class="grid grid-2">
+        <!-- Range -->
+        <div class="card">
+          <h3 style="margin-bottom: 20px;">Range Input</h3>
+          
+          <div class="form-group">
+            <label class="form-label">Volume Control</label>
+            <input type="range" class="form-range" min="0" max="100" value="50" id="range1">
+            <div style="text-align: center; margin-top: 8px; font-size: 14px; color: var(--gray-600);">
+              Value: <span id="range1-value">50</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Disabled Range</label>
+            <input type="range" class="form-range" min="0" max="100" value="30" disabled>
+          </div>
+        </div>
+
+        <!-- File Input -->
+        <div class="card">
+          <h3 style="margin-bottom: 20px;">File Input</h3>
+          
+          <div class="form-group">
+            <label class="form-label">Choose File</label>
+            <input type="file" class="form-control" id="file1" onchange="showFileName(this)">
+            <div class="form-text" id="file1-name">No file chosen</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Multiple Files</label>
+            <input type="file" class="form-control" multiple>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Small File Input</label>
+            <input type="file" class="form-control form-control-sm">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================
+         5. ADVANCED PLUGINS (Vanilla)
+         ============================================ -->
+    <section class="section">
+      <h2 class="section-title">5. Advanced Form Plugins</h2>
+      
+      <div class="grid grid-2">
+        <!-- Date Picker (Native) -->
+        <div class="card">
+          <h3 style="margin-bottom: 20px;">Date & Time Pickers</h3>
+          
+          <div class="form-group">
+            <label class="form-label">Date Picker</label>
+            <input type="date" class="form-control" value="2024-01-15">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Time Picker</label>
+            <input type="time" class="form-control" value="14:30">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Date Range</label>
+            <div style="display: flex; gap: 12px; align-items: center;">
+              <input type="date" class="form-control" placeholder="Start date">
+              <span>to</span>
+              <input type="date" class="form-control" placeholder="End date">
+            </div>
+          </div>
+        </div>
+
+        <!-- Tags Input -->
+        <div class="card">
+          <h3 style="margin-bottom: 20px;">Tags Input</h3>
+          
+          <div class="form-group">
+            <label class="form-label">Add Tags (Press Enter)</label>
+            <div class="tags-input-container" id="tags-container" onclick="document.getElementById('tag-input').focus()">
+              <span class="tag">javascript <span class="tag-remove" onclick="removeTag(this)">×</span></span>
+              <span class="tag">html <span class="tag-remove" onclick="removeTag(this)">×</span></span>
+              <span class="tag">css <span class="tag-remove" onclick="removeTag(this)">×</span></span>
+              <input type="text" id="tag-input" placeholder="Add tag..." onkeydown="handleTagInput(event)">
+            </div>
+            <div class="form-text">Press Enter to add tags</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Color Picker</label>
+            <div class="color-picker-container">
+              <input type="color" id="colorpicker" value="#2563eb" onchange="updateColorPreview(this)">
+              <input type="text" class="form-control" id="color-value" value="#2563eb" style="flex: 1;">
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================
+         6. FORM WIZARDS
+         ============================================ -->
+    <section class="section">
+      <h2 class="section-title">6. Form Wizards</h2>
+      
+      <!-- Wizard Style 1 -->
+      <div style="margin-bottom: 40px;">
+        <h3 style="margin-bottom: 20px; font-size: 20px;">Wizard Style 1 - Numbered Steps</h3>
+        <div class="wizard-container">
+          <div class="wizard-nav">
+            <div class="wizard-step completed">
+              <div class="wizard-number">1</div>
+              <div class="wizard-label">Completed</div>
+            </div>
+            <div class="wizard-step completed">
+              <div class="wizard-number">2</div>
+              <div class="wizard-label">Second Step</div>
+            </div>
+            <div class="wizard-step active">
+              <div class="wizard-number">3</div>
+              <div class="wizard-label">Active Step</div>
+            </div>
+            <div class="wizard-step disabled">
+              <div class="wizard-number">4</div>
+              <div class="wizard-label">Disabled</div>
+            </div>
+            <div class="wizard-step disabled">
+              <div class="wizard-number">5</div>
+              <div class="wizard-label">Last Step</div>
+            </div>
+          </div>
+          <div class="wizard-content">
+            <h4 style="margin-bottom: 16px;">Step 3: Enter Your Details</h4>
+            <div class="form-group">
+              <label class="form-label">Full Name</label>
+              <input type="text" class="form-control" placeholder="John Doe">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input type="email" class="form-control" placeholder="john@example.com">
+            </div>
+            <div style="display: flex; gap: 12px; margin-top: 24px;">
+              <button class="btn btn-secondary" onclick="alert('Previous step')">← Previous</button>
+              <button class="btn btn-primary" onclick="alert('Next step')">Next →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Wizard Style 2 -->
+      <div style="margin-bottom: 40px;">
+        <h3 style="margin-bottom: 20px; font-size: 20px;">Wizard Style 2 - Simple Text</h3>
+        <div class="wizard-container">
+          <div class="wizard-nav-2">
+            <div class="wizard-step completed">
+              <div class="wizard-label">1. Completed Step</div>
+            </div>
+            <div class="wizard-step active">
+              <div class="wizard-label">2. Active Step</div>
+            </div>
+            <div class="wizard-step disabled">
+              <div class="wizard-label">3. Disabled Step</div>
+            </div>
+          </div>
+          <div class="wizard-content">
+            <h4 style="margin-bottom: 16px;">Simple Wizard Content</h4>
+            <p style="color: var(--gray-600);">This wizard uses a cleaner, text-only navigation style with bottom border indicators.</p>
+            <div style="display: flex; gap: 12px; margin-top: 24px;">
+              <button class="btn btn-secondary">← Back</button>
+              <button class="btn btn-primary">Continue →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Wizard Style 3 -->
+      <div>
+        <h3 style="margin-bottom: 20px; font-size: 20px;">Wizard Style 3 - Dots with Labels</h3>
+        <div class="wizard-container">
+          <div class="wizard-nav-3">
+            <div class="wizard-step completed">
+              <div class="wizard-dot"></div>
+              <span class="wizard-step-number">Step 1</span>
+              <div class="wizard-label">Completed</div>
+            </div>
+            <div class="wizard-step completed">
+              <div class="wizard-dot"></div>
+              <span class="wizard-step-number">Step 2</span>
+              <div class="wizard-label">Second</div>
+            </div>
+            <div class="wizard-step active">
+              <div class="wizard-dot">3</div>
+              <span class="wizard-step-number">Step 3</span>
+              <div class="wizard-label">Active</div>
+            </div>
+            <div class="wizard-step disabled">
+              <div class="wizard-dot">4</div>
+              <span class="wizard-step-number">Step 4</span>
+              <div class="wizard-label">Disabled</div>
+            </div>
+            <div class="wizard-step disabled">
+              <div class="wizard-dot">5</div>
+              <span class="wizard-step-number">Step 5</span>
+              <div class="wizard-label">Last</div>
+            </div>
+          </div>
+          <div class="wizard-content">
+            <h4 style="margin-bottom: 16px;">Dot-style Wizard</h4>
+            <p style="color: var(--gray-600); margin-bottom: 24px;">This wizard uses circular dots with connecting lines for a modern, clean look.</p>
+            <div class="form-group">
+              <label class="form-label">Project Name</label>
+              <input type="text" class="form-control" placeholder="Enter project name">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Description</label>
+              <textarea class="form-control" rows="3" placeholder="Project description..."></textarea>
+            </div>
+            <div style="display: flex; gap: 12px; margin-top: 24px;">
+              <button class="btn btn-secondary">← Previous</button>
+              <button class="btn btn-primary">Next →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================
+         7. COMPLETE FORM EXAMPLE
+         ============================================ -->
+    <section class="section">
+      <h2 class="section-title">7. Complete Form Example</h2>
+      
+      <div class="card">
+        <h3 style="margin-bottom: 24px;">Registration Form</h3>
+        
+        <form id="registration-form" onsubmit="handleFormSubmit(event)">
+          <div class="grid grid-2">
+            <div class="form-group">
+              <label class="form-label required">First Name</label>
+              <input type="text" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label required">Last Name</label>
+              <input type="text" class="form-control" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label required">Email Address</label>
+            <input type="email" class="form-control" required>
+          </div>
+
+          <div class="grid grid-2">
+            <div class="form-group">
+              <label class="form-label required">Password</label>
+              <input type="password" class="form-control" id="reg-password" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label required">Confirm Password</label>
+              <input type="password" class="form-control" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Country</label>
+            <select class="form-control">
+              <option>Select country</option>
+              <option>United States</option>
+              <option>United Kingdom</option>
+              <option>India</option>
+              <option>Canada</option>
+              <option>Australia</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Bio</label>
+            <textarea class="form-control" rows="3" placeholder="Tell us about yourself..."></textarea>
+          </div>
+
+          <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="agree" required>
+            <label class="form-check-label" for="agree">I agree to the Terms and Conditions</label>
+          </div>
+
+          <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="newsletter">
+            <label class="form-check-label" for="newsletter">Subscribe to newsletter</label>
+          </div>
+
+          <div style="margin-top: 24px; display: flex; gap: 12px;">
+            <button type="submit" class="btn btn-primary btn-lg">Create Account</button>
+            <button type="reset" class="btn btn-secondary btn-lg">Reset Form</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Buttons (for examples) -->
+  <style>
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 20px;
+      font-size: 14px;
+      font-weight: 500;
+      border-radius: var(--radius);
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      gap: 8px;
+      font-family: inherit;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+    }
+
+    .btn-secondary {
+      background: var(--gray-200);
+      color: var(--gray-900);
+    }
+
+    .btn-secondary:hover {
+      background: var(--gray-300);
+    }
+
+    .btn-lg {
+      padding: 14px 28px;
+      font-size: 16px;
+    }
+  </style>
+
+  <!-- ============================================
+       JAVASCRIPT
+       ============================================ -->
+  <script>
+    // ============================================
+    // RANGE INPUT VALUE DISPLAY
+    // ============================================
+    document.getElementById('range1')?.addEventListener('input', (e) => {
+      document.getElementById('range1-value').textContent = e.target.value;
+    });
+
+    // ============================================
+    // FILE INPUT NAME DISPLAY
+    // ============================================
+    function showFileName(input) {
+      const fileName = input.files[0]?.name || 'No file chosen';
+      document.getElementById(input.id + '-name').textContent = fileName;
+    }
+
+    // ============================================
+    // TAGS INPUT
+    // ============================================
+    function handleTagInput(event) {
+      if (event.key === 'Enter' && event.target.value.trim()) {
+        event.preventDefault();
+        const tagValue = event.target.value.trim();
+        
+        const tag = document.createElement('span');
+        tag.className = 'tag';
+        tag.innerHTML = `${tagValue} <span class="tag-remove" onclick="removeTag(this)">×</span>`;
+        
+        const input = event.target;
+        input.parentElement.insertBefore(tag, input);
+        input.value = '';
+      }
+    }
+
+    function removeTag(element) {
+      element.parentElement.remove();
+    }
+
+    // ============================================
+    // COLOR PICKER
+    // ============================================
+    function updateColorPreview(input) {
+      document.getElementById('color-value').value = input.value;
+    }
+
+    document.getElementById('color-value')?.addEventListener('input', (e) => {
+      const color = e.target.value;
+      if (/^#[0-9A-F]{6}$/i.test(color)) {
+        document.getElementById('colorpicker').value = color;
+      }
+    });
+
+    // ============================================
+    // FORM VALIDATION
+    // ============================================
+    function handleFormSubmit(event) {
+      event.preventDefault();
+      
+      const form = event.target;
+      let isValid = true;
+      
+      // Validate required fields
+      form.querySelectorAll('[required]').forEach(field => {
+        if (!field.value.trim()) {
+          field.classList.add('is-invalid');
+          field.classList.remove('is-valid');
+          isValid = false;
+        } else {
+          field.classList.add('is-valid');
+          field.classList.remove('is-invalid');
+        }
+      });
+      
+      if (isValid) {
+        showToast('Form submitted successfully! 🎉', 'success');
+        form.reset();
+        // Remove validation classes
+        form.querySelectorAll('.is-valid, .is-invalid').forEach(el => {
+          el.classList.remove('is-valid', 'is-invalid');
+        });
+      } else {
+        showToast('Please fill in all required fields', 'error');
+      }
+    }
+
+    // Real-time validation
+    document.querySelectorAll('.form-control[required]').forEach(input => {
+      input.addEventListener('blur', (e) => {
+        if (e.target.value.trim()) {
+          e.target.classList.add('is-valid');
+          e.target.classList.remove('is-invalid');
+        } else {
+          e.target.classList.add('is-invalid');
+          e.target.classList.remove('is-valid');
+        }
+      });
+    });
+
+    // ============================================
+    // TOAST NOTIFICATIONS
+    // ============================================
+    function showToast(message, type = 'info', duration = 3000) {
+      const container = document.getElementById('toast-container') || createToastContainer();
+      
+      const toast = document.createElement('div');
+      toast.className = 'toast-notification';
+      
+      const icons = {
+        success: '✅',
+        error: '❌',
+        warning: '⚠️',
+        info: 'ℹ️'
+      };
+      
+      const colors = {
+        success: 'var(--success)',
+        error: 'var(--danger)',
+        warning: 'var(--warning)',
+        info: 'var(--info)'
+      };
+      
+      toast.style.cssText = `
+        position: relative;
+        background: white;
+        border-left: 4px solid ${colors[type]};
+        padding: 16px 20px;
+        border-radius: 8px;
+        box-shadow: var(--shadow);
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 300px;
+        animation: slideIn 0.3s ease;
+      `;
+      
+      toast.innerHTML = `
+        <span style="font-size: 20px;">${icons[type]}</span>
+        <span style="flex: 1; font-size: 14px;">${message}</span>
+        <button onclick="this.parentElement.remove()" style="background: none; border: none; color: var(--gray-400); cursor: pointer; font-size: 20px; padding: 0;">×</button>
+      `;
+      
+      container.appendChild(toast);
+      
+      setTimeout(() => {
+        toast.style.animation = 'slideIn 0.3s ease reverse';
+        setTimeout(() => toast.remove(), 300);
+      }, duration);
+    }
+
+    function createToastContainer() {
+      const container = document.createElement('div');
+      container.id = 'toast-container';
+      container.style.cssText = `
+        position: fixed;
+        top: 24px;
+        right: 24px;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+      `;
+      document.body.appendChild(container);
+      return container;
+    }
+
+    // Add animation
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes slideIn {
+        from {
+          transform: translateX(400px);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+
+    // ============================================
+    // WIZARD NAVIGATION
+    // ============================================
+    document.querySelectorAll('.wizard-step').forEach(step => {
+      step.addEventListener('click', function() {
+        if (!this.classList.contains('disabled')) {
+          showToast('Wizard step clicked! In production, this would navigate to that step.', 'info');
+        }
+      });
+    });
+
+    // ============================================
+    // INITIALIZATION
+    // ============================================
+    window.addEventListener('DOMContentLoaded', () => {
+      console.log('%c📝 Forms Library v1.0', 'font-size: 18px; font-weight: bold; color: #2563eb;');
+      console.log('%c✨ Pure Vanilla JavaScript - No Bootstrap, No jQuery!', 'font-weight: bold; color: #16a34a;');
+      console.log('\n%c📊 Form Components Available:', 'font-weight: bold;');
+      console.log('1. Text Inputs (Small, Default, Large)');
+      console.log('2. Textarea & Select Dropdowns');
+      console.log('3. Checkboxes & Radio Buttons');
+      console.log('4. Toggle Switches (Custom)');
+      console.log('5. Input Groups (Prefix/Suffix)');
+      console.log('6. Form Validation (Real-time)');
+      console.log('7. Range Sliders');
+      console.log('8. File Input');
+      console.log('9. Date & Time Pickers (Native)');
+      console.log('10. Tags Input (Custom)');
+      console.log('11. Color Picker');
+      console.log('12. Form Wizards (3 Styles)');
+      console.log('\n%c💡 Features:', 'font-weight: bold; color: #f59e0b;');
+      console.log('• Zero Dependencies');
+      console.log('• Pure HTML + CSS + Vanilla JS');
+      console.log('• Real-time Validation');
+      console.log('• Custom Components');
+      console.log('• Mobile Responsive');
+      console.log('• Copy-Paste Ready');
+      console.log('\n%c🎯 Try It:', 'font-weight: bold; color: #9333ea;');
+      console.log('• Fill out the registration form');
+      console.log('• Add tags by typing and pressing Enter');
+      console.log('• Move the range slider');
+      console.log('• Toggle switches');
+      console.log('• Click wizard steps');
+      
+      // Show welcome toast
+      setTimeout(() => {
+        showToast('Welcome to Forms Library! All components are interactive. 🎉', 'success', 5000);
+      }, 500);
+
+      // Count components
+      setTimeout(() => {
+        const counts = {
+          inputs: document.querySelectorAll('input[type="text"], input[type="email"], input[type="password"]').length,
+          textareas: document.querySelectorAll('textarea').length,
+          selects: document.querySelectorAll('select').length,
+          checkboxes: document.querySelectorAll('input[type="checkbox"]').length,
+          radios: document.querySelectorAll('input[type="radio"]').length,
+          switches: document.querySelectorAll('.switch-input').length,
+          ranges: document.querySelectorAll('input[type="range"]').length,
+          files: document.querySelectorAll('input[type="file"]').length,
+          wizards: document.querySelectorAll('.wizard-container').length
+        };
+        
+        const total = Object.values(counts).reduce((a, b) => a + b, 0);
+        
+        console.log('\n%c📈 Component Statistics:', 'font-weight: bold; color: #0ea5e9;');
+        console.log(`Total Form Elements: ${total}`);
+        console.log(`• Text Inputs: ${counts.inputs}`);
+        console.log(`• Textareas: ${counts.textareas}`);
+        console.log(`• Select Dropdowns: ${counts.selects}`);
+        console.log(`• Checkboxes: ${counts.checkboxes}`);
+        console.log(`• Radio Buttons: ${counts.radios}`);
+        console.log(`• Switches: ${counts.switches}`);
+        console.log(`• Range Sliders: ${counts.ranges}`);
+        console.log(`• File Inputs: ${counts.files}`);
+        console.log(`• Form Wizards: ${counts.wizards}`);
+      }, 1000);
+    });
+
+    // ============================================
+    // KEYBOARD SHORTCUTS
+    // ============================================
+    document.addEventListener('keydown', (e) => {
+      // Ctrl + S to submit form
+      if (e.ctrlKey && e.key === 's') {
+        e.preventDefault();
+        const form = document.getElementById('registration-form');
+        if (form) {
+          form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+        }
+      }
+    });
+
+    console.log('\n%c⌨️ Keyboard Shortcuts:', 'font-weight: bold; color: #ec4899;');
+    console.log('Ctrl + S: Submit registration form');
+    console.log('Enter: Submit focused form / Add tag');
+    console.log('Tab: Navigate between form fields');
+  </script>
+
+</body>
+</html>

@@ -1,117 +1,150 @@
 /**
- * Modal Component - Application Starter Kit
- * Dialog/popup management
- * Version: 2.0
+ * Modal Component (No-Module Version)
  */
+(function (global) {
+    const Component = global.VanillaNext.Component;
 
-const Modal = {
-  open(modalId) {
-    const modal = document.getElementById(modalId);
-    if (!modal) return;
-    
-    modal.classList.add('active');
-    document.body.style.overflow = 'hidden';
-    
-    const focusable = modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
-    if (focusable.length > 0) {
-      focusable[0].focus();
-    }
-    
-    modal.dispatchEvent(new CustomEvent('modal:open'));
-  },
-  
-  close(modalId) {
-    const modal = document.getElementById(modalId);
-    if (!modal) return;
-    
-    modal.classList.remove('active');
-    document.body.style.overflow = '';
-    
-    modal.dispatchEvent(new CustomEvent('modal:close'));
-  },
-  
-  closeAll() {
-    document.querySelectorAll('.modal-overlay.active').forEach(modal => {
-      modal.classList.remove('active');
-    });
-    document.body.style.overflow = '';
-  },
-  
-  confirm(options = {}) {
-    const {
-      title = 'Confirm',
-      message = 'Are you sure?',
-      confirmText = 'Confirm',
-      cancelText = 'Cancel',
-      confirmClass = 'btn-danger',
-      onConfirm = () => {},
-      onCancel = () => {}
-    } = options;
-    
-    let modal = document.getElementById('modal-confirm');
-    if (!modal) {
-      modal = document.createElement('div');
-      modal.className = 'modal-overlay';
-      modal.id = 'modal-confirm';
-      modal.innerHTML = `
-        <div class="modal">
-          <div class="modal-header">
-            <h2 class="modal-title" id="confirm-title"></h2>
-            <button class="modal-close" onclick="Modal.close('modal-confirm')">&times;</button>
-          </div>
-          <div class="modal-body">
-            <p id="confirm-message"></p>
-          </div>
-          <div class="modal-footer">
-            <button class="btn btn-secondary" id="confirm-cancel">Cancel</button>
-            <button class="btn" id="confirm-action">Confirm</button>
-          </div>
-        </div>
-      `;
-      document.body.appendChild(modal);
-    }
-    
-    modal.querySelector('#confirm-title').textContent = title;
-    modal.querySelector('#confirm-message').textContent = message;
-    modal.querySelector('#confirm-cancel').textContent = cancelText;
-    modal.querySelector('#confirm-action').textContent = confirmText;
-    modal.querySelector('#confirm-action').className = `btn ${confirmClass}`;
-    
-    const confirmBtn = modal.querySelector('#confirm-action');
-    const cancelBtn = modal.querySelector('#confirm-cancel');
-    
-    const cleanup = () => {
-      confirmBtn.replaceWith(confirmBtn.cloneNode(true));
-      cancelBtn.replaceWith(cancelBtn.cloneNode(true));
+    global.VanillaNext.Modal = class Modal extends Component {
+        get defaults() {
+            return {
+                keyboard: true,
+                backdrop: true
+            };
+        }
+
+        init() {
+            this.id = this.element.id;
+            this.backdrop = document.querySelector('.modal-backdrop') || this._createBackdrop();
+
+            this.close = this.close.bind(this);
+            this.handleKeydown = this.handleKeydown.bind(this);
+            this.handleBackdropClick = this.handleBackdropClick.bind(this);
+
+            this.element.querySelectorAll('[data-dismiss="modal"]').forEach(btn => {
+                btn.addEventListener('click', this.close);
+            });
+
+            document.querySelectorAll(`[data-toggle="modal"][data-target="#${this.id}"]`).forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.open();
+                });
+            });
+        }
+
+        _createBackdrop() {
+            const backdrop = document.createElement('div');
+            backdrop.className = 'modal-backdrop';
+            document.body.appendChild(backdrop);
+            return backdrop;
+        }
+
+        open() {
+            this.backdrop.classList.add('show');
+            this.element.classList.add('show');
+            document.body.style.overflow = 'hidden';
+
+            if (this.options.keyboard) {
+                document.addEventListener('keydown', this.handleKeydown);
+            }
+
+            if (this.options.backdrop) {
+                this.backdrop.addEventListener('click', this.handleBackdropClick);
+            }
+
+            this.emit('modal.open');
+        }
+
+        close() {
+            this.backdrop.classList.remove('show');
+            this.element.classList.remove('show');
+            document.body.style.overflow = '';
+
+            document.removeEventListener('keydown', this.handleKeydown);
+            this.backdrop.removeEventListener('click', this.handleBackdropClick);
+
+            this.emit('modal.close');
+        }
+
+        handleKeydown(e) {
+            if (e.key === 'Escape') this.close();
+        }
+
+        handleBackdropClick(e) {
+            if (e.target === this.backdrop) this.close();
+        }
+        static open(id) {
+            const el = typeof id === 'string' ? document.getElementById(id) : id;
+            if (!el) return;
+            if (!el._modal) {
+                el._modal = new Modal(el);
+            }
+            el._modal.open();
+        }
+
+        static close(id) {
+            const el = typeof id === 'string' ? document.getElementById(id) : id;
+            if (!el) return;
+            if (el._modal) {
+                el._modal.close();
+            } else {
+                el.classList.remove('show');
+                const backdrop = document.querySelector('.modal-backdrop');
+                if (backdrop) backdrop.classList.remove('show');
+                document.body.style.overflow = '';
+            }
+        }
+
+        static confirm(options) {
+            const { title, message, confirmText, confirmClass, onConfirm } = options;
+            let modalEl = document.getElementById('modal-confirm-global');
+
+            if (!modalEl) {
+                modalEl = document.createElement('div');
+                modalEl.id = 'modal-confirm-global';
+                modalEl.className = 'modal';
+                modalEl.innerHTML = `
+                    <div class="modal-header">
+                        <h2 class="modal-title" id="modal-confirm-title"></h2>
+                        <button class="modal-close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body" id="modal-confirm-body"></div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button class="btn" id="modal-confirm-btn"></button>
+                    </div>
+                `;
+                document.body.appendChild(modalEl);
+            }
+
+            modalEl.querySelector('#modal-confirm-title').textContent = title || 'Confirm';
+            modalEl.querySelector('#modal-confirm-body').textContent = message || 'Are you sure?';
+
+            const confirmBtn = modalEl.querySelector('#modal-confirm-btn');
+            confirmBtn.textContent = confirmText || 'Confirm';
+            confirmBtn.className = `btn ${confirmClass || 'btn-primary'}`;
+
+            // New click handler
+            const newHandler = async () => {
+                confirmBtn.removeEventListener('click', newHandler);
+                if (onConfirm) await onConfirm();
+                this.close('modal-confirm-global');
+            };
+
+            // Remove old potential listeners (simplest way is cloning if needed, but here we just replace)
+            const oldHandler = confirmBtn._handler;
+            if (oldHandler) confirmBtn.removeEventListener('click', oldHandler);
+            confirmBtn.addEventListener('click', newHandler);
+            confirmBtn._handler = newHandler;
+
+            this.open('modal-confirm-global');
+        }
     };
-    
-    modal.querySelector('#confirm-action').onclick = () => {
-      this.close('modal-confirm');
-      cleanup();
-      onConfirm();
-    };
-    
-    modal.querySelector('#confirm-cancel').onclick = () => {
-      this.close('modal-confirm');
-      cleanup();
-      onCancel();
-    };
-    
-    this.open('modal-confirm');
-  }
-};
 
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') {
-    Modal.closeAll();
-  }
-});
+    // Register
+    global.VanillaNext.registry['modal'] = global.VanillaNext.Modal;
 
-document.addEventListener('click', (e) => {
-  if (e.target.classList.contains('modal-overlay')) {
-    e.target.classList.remove('active');
-    document.body.style.overflow = '';
-  }
-});
+    // Expose Global Alias
+    global.Modal = global.VanillaNext.Modal;
 
-window.Modal = Modal;
+})(window);

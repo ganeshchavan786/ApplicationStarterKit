@@ -6,10 +6,10 @@
 
 const API = {
   baseURL: '/api/v1',
-  
+
   async request(endpoint, options = {}) {
     const token = localStorage.getItem('access_token');
-    
+
     const config = {
       ...options,
       headers: {
@@ -17,33 +17,33 @@ const API = {
         ...options.headers
       }
     };
-    
+
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`;
     }
-    
+
     if (options.body && typeof options.body === 'object') {
       config.body = JSON.stringify(options.body);
     }
-    
+
     try {
       const response = await fetch(`${this.baseURL}${endpoint}`, config);
       const data = await response.json();
-      
+
       if (!response.ok) {
         if (response.status === 401) {
           this.handleUnauthorized();
         }
         throw { status: response.status, ...data };
       }
-      
+
       return data;
     } catch (error) {
       if (error.status) throw error;
       throw { status: 0, message: 'Network error', error };
     }
   },
-  
+
   handleUnauthorized() {
     localStorage.removeItem('access_token');
     localStorage.removeItem('user');
@@ -51,23 +51,23 @@ const API = {
       window.location.href = '/frontend/login.html';
     }
   },
-  
+
   get(endpoint) {
     return this.request(endpoint, { method: 'GET' });
   },
-  
+
   post(endpoint, body) {
     return this.request(endpoint, { method: 'POST', body });
   },
-  
+
   put(endpoint, body) {
     return this.request(endpoint, { method: 'PUT', body });
   },
-  
+
   delete(endpoint) {
     return this.request(endpoint, { method: 'DELETE' });
   },
-  
+
   // Auth endpoints
   auth: {
     login: (data) => API.post('/auth/login', data),
@@ -78,7 +78,7 @@ const API = {
     forgotPassword: (email) => API.post('/auth/forgot-password', { email }),
     resetPassword: (data) => API.post('/auth/reset-password', data)
   },
-  
+
   // Users endpoints
   users: {
     list: (companyId, params = {}) => {
@@ -91,7 +91,7 @@ const API = {
     delete: (companyId, userId) => API.delete(`/companies/${companyId}/users/${userId}`),
     updateRole: (companyId, userId, role) => API.put(`/companies/${companyId}/users/${userId}/role`, { role })
   },
-  
+
   // Companies endpoints
   companies: {
     list: (params = {}) => {
@@ -104,14 +104,24 @@ const API = {
     delete: (id) => API.delete(`/companies/${id}`),
     select: (id) => API.post(`/companies/select/${id}`)
   },
-  
+
   // Permissions endpoints
   permissions: {
     list: () => API.get('/permissions'),
-    getByRole: (role) => API.get(`/permissions/role/${role}`),
-    check: (data) => API.post('/permissions/check', data)
+    getByRole: (role, companyId) => {
+      const query = companyId ? `?company_id=${companyId}` : '';
+      return API.get(`/permissions/role/${role}${query}`);
+    },
+    check: (data) => API.post('/permissions/check', data),
+    assign: (permissionId, role, companyId) => {
+      const data = { permission_id: permissionId, role, company_id: companyId };
+      return API.post(`/permissions/assign?permission_id=${permissionId}&role=${role}${companyId ? '&company_id=' + companyId : ''}`, {});
+    },
+    revoke: (permissionId, role, companyId) => {
+      return API.post(`/permissions/revoke?permission_id=${permissionId}&role=${role}${companyId ? '&company_id=' + companyId : ''}`, {});
+    }
   },
-  
+
   // Health endpoints
   health: {
     check: () => API.get('/health'),

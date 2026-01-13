@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,28 +12,156 @@
   <link rel="stylesheet" href="css/advanced.css">
   <script src="js/lib/chart.min.js"></script>
   <style>
-    .code-block { background: #1f2937; color: #f3f4f6; padding: 12px 16px; border-radius: 0 0 8px 8px; font-family: monospace; font-size: 13px; position: relative; overflow-x: auto; }
-    .code-block pre { margin: 0; white-space: pre-wrap; }
-    .copy-btn { position: absolute; top: 8px; right: 8px; background: #374151; color: white; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; }
-    .copy-btn:hover { background: #4b5563; }
-    .demo-box { background: #f9fafb; padding: 20px; border: 1px solid #e5e7eb; border-radius: 8px 8px 0 0; }
-    .component-section { margin-bottom: 40px; }
-    .section-title { font-size: 20px; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid #2563eb; }
-    .nav-sidebar { position: fixed; left: 20px; top: 100px; width: 180px; background: white; padding: 16px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-    .nav-sidebar a { display: block; padding: 8px 12px; color: #374151; text-decoration: none; font-size: 13px; border-radius: 4px; margin-bottom: 4px; }
-    .nav-sidebar a:hover { background: #f3f4f6; color: #2563eb; }
-    .nav-sidebar .nav-title { font-weight: 600; font-size: 11px; text-transform: uppercase; color: #9ca3af; margin: 12px 0 8px; }
-    @media (max-width: 1200px) { .nav-sidebar { display: none; } }
+    .code-block {
+      background: #1f2937;
+      color: #f3f4f6;
+      padding: 12px 16px;
+      border-radius: 0 0 8px 8px;
+      font-family: monospace;
+      font-size: 13px;
+      position: relative;
+      overflow-x: auto;
+    }
+
+    .code-block pre {
+      margin: 0;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .copy-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: #374151;
+      color: white;
+      border: none;
+      padding: 4px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    .copy-btn:hover {
+      background: #4b5563;
+    }
+
+    .demo-box {
+      background: #f9fafb;
+      padding: 20px;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px 8px 0 0;
+    }
+
+    .component-section {
+      margin-bottom: 40px;
+    }
+
+    .section-title {
+      font-size: 20px;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #2563eb;
+    }
+
+    .nav-sidebar {
+      position: fixed;
+      left: 20px;
+      top: 100px;
+      width: 180px;
+      background: white;
+      padding: 16px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      z-index: 100;
+    }
+
+    .nav-sidebar a {
+      display: block;
+      padding: 8px 12px;
+      color: #374151;
+      text-decoration: none;
+      font-size: 13px;
+      border-radius: 4px;
+      margin-bottom: 4px;
+    }
+
+    .nav-sidebar a:hover {
+      background: #f3f4f6;
+      color: #2563eb;
+    }
+
+    .nav-sidebar .nav-title {
+      font-weight: 600;
+      font-size: 11px;
+      text-transform: uppercase;
+      color: #9ca3af;
+      margin: 12px 0 8px;
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 1200px) {
+      .nav-sidebar {
+        display: none;
+      }
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 16px !important;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+
+      .section-title {
+        font-size: 18px;
+      }
+
+      .demo-box {
+        padding: 12px;
+      }
+
+      .demo-box .flex {
+        flex-wrap: wrap;
+      }
+
+      .code-block {
+        padding: 10px;
+        font-size: 11px;
+      }
+
+      .quick-dates {
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .quick-date-btn {
+        font-size: 12px;
+        padding: 6px 10px;
+      }
+
+      .daterange-wrapper {
+        flex-direction: column;
+      }
+
+      .daterange-separator {
+        display: none;
+      }
+    }
   </style>
 </head>
+
 <body style="padding: 32px; max-width: 900px; margin: 0 auto;">
-  
+
   <!-- Navigation Sidebar -->
   <nav class="nav-sidebar">
     <a href="#buttons">Buttons</a>
     <a href="#badges">Badges</a>
     <a href="#cards">Cards</a>
     <a href="#forms">Forms</a>
+    <a href="#widgets">🧩 New Widgets</a>
     <span class="nav-title">Advanced</span>
     <a href="#charts">📊 Charts</a>
     <a href="#progress">Progress Bars</a>
@@ -52,18 +181,72 @@
 
   <div class="component-section">
     <h2 class="section-title">Buttons</h2>
-    <div class="demo-box flex gap-2">
-      <button class="btn btn-primary">Primary</button>
-      <button class="btn btn-secondary">Secondary</button>
-      <button class="btn btn-success">Success</button>
-      <button class="btn btn-danger">Danger</button>
+
+    <div class="mb-4">
+      <h3 class="text-sm font-semibold text-muted mb-2">Standard</h3>
+      <div class="demo-box flex gap-2">
+        <button class="btn btn-primary">Primary</button>
+        <button class="btn btn-secondary">Secondary</button>
+        <button class="btn btn-success">Success</button>
+        <button class="btn btn-danger">Danger</button>
+      </div>
+    </div>
+
+    <div class="mb-4">
+      <h3 class="text-sm font-semibold text-muted mb-2">Gradient & Modern</h3>
+      <div class="demo-box flex gap-2">
+        <button class="btn btn-gradient-primary">Gradient Primary</button>
+        <button class="btn btn-gradient-success">Gradient Success</button>
+        <button class="btn btn-purple">Purple</button>
+        <button class="btn btn-pink">Pink</button>
+      </div>
+    </div>
+
+    <div class="mb-4">
+      <h3 class="text-sm font-semibold text-muted mb-2">Soft / Pastel</h3>
+      <div class="demo-box flex gap-2">
+        <button class="btn btn-soft-primary">Soft Primary</button>
+        <button class="btn btn-soft-success">Soft Success</button>
+        <button class="btn btn-soft-danger">Soft Danger</button>
+        <button class="btn btn-soft-purple">Soft Purple</button>
+      </div>
+    </div>
+
+    <div class="code-block">
+      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      <pre>&lt;!-- Gradient --&gt;
+&lt;button class="btn btn-gradient-primary"&gt;Gradient&lt;/button&gt;
+&lt;button class="btn btn-gradient-success"&gt;Success&lt;/button&gt;
+
+&lt;!-- Soft / Pastel --&gt;
+&lt;button class="btn btn-soft-primary"&gt;Soft Primary&lt;/button&gt;
+&lt;button class="btn btn-soft-purple"&gt;Soft Purple&lt;/button&gt;</pre>
+    </div>
+  </div>
+
+  <div class="component-section">
+    <h2 class="section-title">Glassmorphism & Cards</h2>
+    <div class="demo-box"
+      style="background: url('https://images.unsplash.com/photo-1557683316-973673baf926?auto=format&fit=crop&w=1000&q=80') center/cover; padding: 40px;">
+
+      <div class="card card-glass" style="max-width: 400px; margin: 0 auto;">
+        <div class="card-header border-0 bg-transparent">
+          <span class="card-title font-bold">Glass Card</span>
+        </div>
+        <div class="card-body">
+          <p class="mb-4">This is a glassmorphism effect card. It uses backdrop-filter to create a blur effect over the
+            background image.</p>
+          <button class="btn btn-gradient-primary w-full">Action</button>
+        </div>
+      </div>
+
     </div>
     <div class="code-block">
       <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-      <pre>&lt;button class="btn btn-primary"&gt;Primary&lt;/button&gt;
-&lt;button class="btn btn-secondary"&gt;Secondary&lt;/button&gt;
-&lt;button class="btn btn-success"&gt;Success&lt;/button&gt;
-&lt;button class="btn btn-danger"&gt;Danger&lt;/button&gt;</pre>
+      <pre>&lt;div class="card card-glass"&gt;
+  &lt;div class="card-header bg-transparent"&gt;Title&lt;/div&gt;
+  &lt;div class="card-body"&gt;...&lt;/div&gt;
+&lt;/div&gt;</pre>
     </div>
   </div>
 
@@ -200,7 +383,9 @@ Toast.info('Info message!');</pre>
   <div class="component-section">
     <h2 class="section-title">Modals</h2>
     <div class="demo-box flex gap-2">
-      <button class="btn btn-primary" onclick="Modal.confirm({title:'Confirm Action',message:'Are you sure?',onConfirm:()=>Toast.success('Confirmed!')})">Open Confirm</button>
+      <button class="btn btn-primary"
+        onclick="Modal.confirm({title:'Confirm Action',message:'Are you sure?',onConfirm:()=>Toast.success('Confirmed!')})">Open
+        Confirm</button>
     </div>
     <div class="code-block">
       <button class="copy-btn" onclick="copyCode(this)">Copy</button>
@@ -216,9 +401,122 @@ Modal.confirm({
     </div>
   </div>
 
+
+  <!-- ==================== WIDGETS SECTION ==================== -->
+  <h2 id="widgets" style="margin-top: 60px; color: #2563eb; scroll-margin-top: 100px;">🧩 New Widgets (From Note Folder)
+  </h2>
+
+  <div class="component-section">
+    <h2 class="section-title">Stats Widgets</h2>
+    <div class="demo-box grid grid-3 gap-4"
+      style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
+
+      <div class="stats-widget">
+        <div class="stats-header">
+          <span class="stats-label">Total Users</span>
+          <span class="stats-badge positive">↑ 12%</span>
+        </div>
+        <div class="stats-value">1,234</div>
+        <div class="text-muted text-sm">vs. last month</div>
+      </div>
+
+      <div class="stats-widget">
+        <div class="stats-header">
+          <span class="stats-label">Revenue</span>
+          <span class="stats-badge negative">↓ 3%</span>
+        </div>
+        <div class="stats-value">$45.2k</div>
+        <div class="text-muted text-sm">vs. last month</div>
+      </div>
+
+    </div>
+    <div class="code-block">
+      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      <pre>&lt;div class="stats-widget"&gt;
+  &lt;div class="stats-header"&gt;
+    &lt;span class="stats-label"&gt;Label&lt;/span&gt;
+    &lt;span class="stats-badge positive"&gt;↑ 12%&lt;/span&gt;
+  &lt;/div&gt;
+  &lt;div class="stats-value"&gt;1,234&lt;/div&gt;
+&lt;/div&gt;</pre>
+    </div>
+  </div>
+
+  <div class="component-section">
+    <h2 class="section-title">User Avatars</h2>
+    <div class="demo-box">
+      <div class="user-list-widget">
+        <div class="user-avatars">
+          <div class="user-avatar" style="background: #2563eb;"></div>
+          <div class="user-avatar" style="background: #16a34a;"></div>
+          <div class="user-avatar" style="background: #f59e0b;"></div>
+          <div class="user-avatar" style="background: #ec4899;"></div>
+          <div class="user-count">+5</div>
+        </div>
+      </div>
+    </div>
+    <div class="code-block">
+      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      <pre>&lt;div class="user-avatars"&gt;
+  &lt;div class="user-avatar"&gt;&lt;/div&gt;
+  &lt;div class="user-count"&gt;+5&lt;/div&gt;
+&lt;/div&gt;</pre>
+    </div>
+  </div>
+
+  <div class="component-section">
+    <h2 class="section-title">Chat Widget</h2>
+    <div class="demo-box">
+      <div class="chat-widget" style="max-width: 400px;">
+        <div class="chat-header">Customer Support</div>
+        <div class="chat-messages">
+          <div class="chat-message received">
+            <div class="chat-bubble">Hello! How can I help you today?</div>
+          </div>
+          <div class="chat-message sent">
+            <div class="chat-bubble">I have a question about my order.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="code-block">
+      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      <pre>&lt;div class="chat-widget"&gt;
+  &lt;div class="chat-header"&gt;Header&lt;/div&gt;
+  &lt;div class="chat-messages"&gt;
+    &lt;div class="chat-message received"&gt;...&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</pre>
+    </div>
+  </div>
+
+  <div class="component-section">
+    <h2 class="section-title">Product Card</h2>
+    <div class="demo-box" style=" max-width: 400px;">
+      <div class="product-card">
+        <div class="product-image">📱</div>
+        <div style="flex: 1;">
+          <div class="font-bold text-lg">iPhone 14 Pro</div>
+          <div class="text-muted text-sm">Apple Inc.</div>
+          <div class="mt-2 font-bold text-primary">$999</div>
+        </div>
+      </div>
+    </div>
+    <div class="code-block">
+      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      <pre>&lt;div class="product-card"&gt;
+  &lt;div class="product-image"&gt;...&lt;/div&gt;
+  &lt;div&gt;
+    &lt;div class="title"&gt;iPhone 14&lt;/div&gt;
+    &lt;div class="price"&gt;$999&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</pre>
+    </div>
+  </div>
+
   <!-- ==================== CHARTS SECTION ==================== -->
   <h2 style="margin-top: 60px; color: #2563eb;">📊 Charts (Chart.js)</h2>
-  
+
   <div class="component-section" id="charts">
     <h2 class="section-title">Line Chart</h2>
     <div class="demo-box">
@@ -275,12 +573,20 @@ Modal.confirm({
   <div class="component-section" id="progress">
     <h2 class="section-title">Progress Bars</h2>
     <div class="demo-box">
-      <div class="progress" style="margin-bottom: 12px;"><div class="progress-bar" style="width: 75%;"></div></div>
-      <div class="progress" style="margin-bottom: 12px;"><div class="progress-bar success" style="width: 50%;"></div></div>
-      <div class="progress"><div class="progress-bar danger" style="width: 25%;"></div></div>
+      <div class="progress" style="margin-bottom: 12px;">
+        <div class="progress-bar" style="width: 75%;"></div>
+      </div>
+      <div class="progress" style="margin-bottom: 12px;">
+        <div class="progress-bar success" style="width: 50%;"></div>
+      </div>
+      <div class="progress">
+        <div class="progress-bar danger" style="width: 25%;"></div>
+      </div>
       <div class="progress-labeled" style="margin-top: 16px;">
         <span>Progress</span>
-        <div class="progress"><div class="progress-bar" style="width: 65%;"></div></div>
+        <div class="progress">
+          <div class="progress-bar" style="width: 65%;"></div>
+        </div>
         <span class="progress-value">65%</span>
       </div>
     </div>
@@ -304,7 +610,7 @@ Modal.confirm({
       <div id="tab1" class="tab-content active">Content for Tab 1</div>
       <div id="tab2" class="tab-content">Content for Tab 2</div>
       <div id="tab3" class="tab-content">Content for Tab 3</div>
-      
+
       <p style="margin-top: 24px; font-weight: 600;">Pills Style:</p>
       <div class="tabs-pills" style="display: inline-flex;">
         <button class="tab active">Week</button>
@@ -576,12 +882,12 @@ TimePicker.init('time-input');</pre>
     <h2 class="section-title">Quick Date Selection</h2>
     <div class="demo-box">
       <div class="quick-dates">
-        <button class="quick-date-btn active" onclick="setQuickDate('today')">Today</button>
-        <button class="quick-date-btn" onclick="setQuickDate('yesterday')">Yesterday</button>
-        <button class="quick-date-btn" onclick="setQuickDate('week')">This Week</button>
-        <button class="quick-date-btn" onclick="setQuickDate('month')">This Month</button>
-        <button class="quick-date-btn" onclick="setQuickDate('last30')">Last 30 Days</button>
-        <button class="quick-date-btn" onclick="setQuickDate('quarter')">This Quarter</button>
+        <button class="quick-date-btn active" onclick="setQuickDate('today', this)">Today</button>
+        <button class="quick-date-btn" onclick="setQuickDate('yesterday', this)">Yesterday</button>
+        <button class="quick-date-btn" onclick="setQuickDate('week', this)">This Week</button>
+        <button class="quick-date-btn" onclick="setQuickDate('month', this)">This Month</button>
+        <button class="quick-date-btn" onclick="setQuickDate('last30', this)">Last 30 Days</button>
+        <button class="quick-date-btn" onclick="setQuickDate('quarter', this)">This Quarter</button>
       </div>
       <div class="form-group" style="max-width: 300px; margin-top: 16px;">
         <label class="form-label">Selected Date</label>
@@ -647,23 +953,23 @@ TimePicker.init('time-input');</pre>
         setTimeout(() => btn.textContent = 'Copy', 2000);
       });
     }
-    
+
     function showTab(event, tabId) {
       document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
       document.querySelectorAll('.tabs .tab').forEach(t => t.classList.remove('active'));
       document.getElementById(tabId).classList.add('active');
       event.target.classList.add('active');
     }
-    
+
     // Quick Date Selection
-    function setQuickDate(type) {
+    function setQuickDate(type, btn) {
       const today = new Date();
       let dateStr = '';
-      
+
       document.querySelectorAll('.quick-date-btn').forEach(b => b.classList.remove('active'));
-      event.target.classList.add('active');
-      
-      switch(type) {
+      if (btn) btn.classList.add('active');
+
+      switch (type) {
         case 'today':
           dateStr = today.toISOString().split('T')[0];
           break;
@@ -689,7 +995,7 @@ TimePicker.init('time-input');</pre>
           dateStr = qStart.toISOString().split('T')[0] + ' to ' + today.toISOString().split('T')[0];
           break;
       }
-      
+
       document.getElementById('demo-quickdate').value = dateStr;
     }
 
@@ -703,7 +1009,7 @@ TimePicker.init('time-input');</pre>
           { label: 'Orders', data: [28, 48, 40, 59, 86, 27, 45], color: '#10b981' }
         ]
       });
-      
+
       // Bar Chart
       Charts.bar('demoBarChart', {
         labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
@@ -713,36 +1019,36 @@ TimePicker.init('time-input');</pre>
           colors: ['#2563eb', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6']
         }]
       });
-      
+
       // Doughnut Chart
       Charts.doughnut('demoDoughnutChart', {
         labels: ['Admin', 'Manager', 'User'],
         values: [15, 35, 50],
         colors: ['#2563eb', '#10b981', '#3b82f6']
       });
-      
+
       // Date Picker
       DatePicker.init('demo-datepicker', {
         format: 'YYYY-MM-DD',
         onChange: (date, value) => Toast.success('Selected: ' + value)
       });
-      
+
       // Time Pickers
       TimePicker.init('demo-timepicker-24', {
         format: '24h',
         step: 30,
         onChange: (time) => Toast.info('Time: ' + time)
       });
-      
+
       TimePicker.init('demo-timepicker-12', {
         format: '12h',
         step: 30
       });
-      
+
       // DateTime Picker
       DatePicker.init('demo-datetime-date');
       TimePicker.init('demo-datetime-time', { format: '12h' });
-      
+
       // Date Range Picker
       DateRangePicker.init('demo-range-start', 'demo-range-end', {
         onChange: (range) => {
@@ -751,10 +1057,12 @@ TimePicker.init('time-input');</pre>
           }
         }
       });
-      
+
       // Set initial quick date
-      setQuickDate('today');
+      const todayBtn = document.querySelector('.quick-date-btn');
+      if (todayBtn) setQuickDate('today', todayBtn);
     });
   </script>
 </body>
+
 </html>

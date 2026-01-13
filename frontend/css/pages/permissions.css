@@ -1,0 +1,288 @@
+/* ============================================
+   PERMISSIONS PAGE
+   ============================================ */
+
+.admin-layout {
+    display: flex;
+    min-height: 100vh;
+    font-family: 'Inter', sans-serif;
+}
+
+.admin-sidebar {
+    width: 260px;
+    background: var(--bg-surface);
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    z-index: 50;
+}
+
+.admin-main {
+    flex: 1;
+    margin-left: 260px;
+    background: var(--bg-body);
+    display: flex;
+    flex-direction: column;
+}
+
+.admin-header {
+    height: 64px;
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    position: sticky;
+    top: 0;
+    z-index: 40;
+}
+
+.sidebar-brand {
+    height: 64px;
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    font-weight: 800;
+    font-size: 1.25rem;
+    color: var(--primary-600);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.sidebar-nav {
+    padding: 16px 0;
+    flex: 1;
+}
+
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    padding: 10px 24px;
+    color: var(--gray-600);
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s;
+    font-size: 0.875rem;
+}
+
+.sidebar-link:hover,
+.sidebar-link.active {
+    background: var(--primary-50);
+    color: var(--primary-600);
+    border-right: 3px solid var(--primary-600);
+}
+
+.sidebar-icon {
+    width: 20px;
+    text-align: center;
+    margin-right: 12px;
+    font-size: 1.1rem;
+    display: inline-block;
+}
+
+.btn-ghost {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-ghost:hover {
+    background: var(--gray-100);
+}
+
+#theme-toggle {
+    font-size: 1.2rem;
+}
+
+@media (max-width: 1024px) {
+    .admin-sidebar {
+        display: none;
+    }
+
+    .admin-sidebar.open {
+        display: flex;
+    }
+
+    .admin-main {
+        margin-left: 0;
+    }
+}
+
+
+.permissions-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: var(--space-6);
+    height: auto;
+    min-height: calc(100vh - 120px);
+}
+
+.role-sidebar {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.role-sidebar-header {
+    padding: var(--space-4);
+    border-bottom: 1px solid var(--border-color);
+    background: var(--gray-50);
+}
+
+.role-list {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.role-item {
+    padding: var(--space-4) var(--space-6);
+    border-bottom: 1px solid var(--gray-100);
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    color: var(--gray-600);
+}
+
+.role-item:hover {
+    background: var(--gray-50);
+    color: var(--primary-600);
+}
+
+.role-item.active {
+    background: var(--primary-50);
+    color: var(--primary-600);
+    border-left: 4px solid var(--primary-600);
+    padding-left: calc(var(--space-6) - 4px);
+}
+
+.role-icon {
+    font-size: 1.25rem;
+}
+
+.role-info {
+    flex: 1;
+}
+
+.role-name {
+    font-weight: 600;
+    display: block;
+}
+
+.role-desc {
+    font-size: 0.75rem;
+    opacity: 0.7;
+}
+
+/* Permission Matrix */
+.permission-matrix-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    display: flex;
+    flex-direction: column;
+}
+
+.permission-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.permission-table th,
+.permission-table td {
+    padding: var(--space-4) var(--space-6);
+    border-bottom: 1px solid var(--border-color);
+    text-align: center;
+}
+
+.permission-table th:first-child,
+.permission-table td:first-child {
+    text-align: left;
+    width: 30%;
+}
+
+.resource-name {
+    font-weight: 600;
+    color: var(--gray-800);
+}
+
+/* Toggle Switch */
+.perm-toggle {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 22px;
+}
+
+.perm-toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--gray-200);
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked+.toggle-slider {
+    background-color: var(--success);
+}
+
+input:focus+.toggle-slider {
+    box-shadow: 0 0 1px var(--success);
+}
+
+input:checked+.toggle-slider:before {
+    transform: translateX(22px);
+}
+
+.status-badge {
+    font-size: 0.7rem;
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-left: var(--space-2);
+}
+
+.status-granted {
+    background: var(--success-light);
+    color: var(--success);
+}
+
+.status-denied {
+    background: var(--gray-100);
+    color: var(--gray-400);
+}

@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Widgets Library + Charts - Pure Vanilla JS</title>
+  <style>
+    /* ============================================
+       DESIGN TOKENS
+       ============================================ */
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --primary-light: #dbeafe;
+      --success: #16a34a;
+      --success-light: #dcfce7;
+      --danger: #dc2626;
+      --danger-light: #fee2e2;
+      --warning: #f59e0b;
+      --warning-light: #fef3c7;
+      --info: #0ea5e9;
+      --info-light: #e0f2fe;
+      --teal: #14b8a6;
+      --cyan: #06b6d4;
+      --indigo: #6366f1;
+      --pink: #ec4899;
+      
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-300: #d1d5db;
+      --gray-500: #6b7280;
+      --gray-600: #4b5563;
+      --gray-700: #374151;
+      --gray-800: #1f2937;
+      --gray-900: #111827;
+      
+      --radius: 8px;
+      --radius-lg: 12px;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-5: 20px;
+      --space-6: 24px;
+      --space-8: 32px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--gray-50);
+      color: var(--gray-900);
+      line-height: 1.6;
+    }
+
+    /* ============================================
+       LAYOUT
+       ============================================ */
+    .navbar {
+      background: white;
+      border-bottom: 1px solid var(--gray-200);
+      padding: var(--space-4) var(--space-6);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .navbar-brand {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: var(--space-8) var(--space-6);
+    }
+
+    .section {
+      margin-bottom: var(--space-8);
+    }
+
+    .section-title {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: var(--space-6);
+      color: var(--gray-900);
+    }
+
+    .grid {
+      display: grid;
+      gap: var(--space-6);
+    }
+
+    .grid-2 { grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); }
+    .grid-3 { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+    .grid-4 { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+
+    /* ============================================
+       BASE CARD COMPONENT
+       ============================================ */
+    .widget {
+      background: white;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--gray-200);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.2s;
+    }
+
+    .widget:hover {
+      box-shadow: var(--shadow);
+    }
+
+    .widget-header {
+      padding: var(--space-4) var(--space-5);
+      border-bottom: 1px solid var(--gray-200);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .widget-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--gray-900);
+    }
+
+    .widget-body {
+      padding: var(--space-5);
+    }
+
+    .widget-footer {
+      padding: var(--space-4) var(--space-5);
+      border-top: 1px solid var(--gray-200);
+      background: var(--gray-50);
+    }
+
+    /* ============================================
+       1. STATS WIDGET
+       ============================================ */
+    .stats-widget {
+      background: white;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--gray-200);
+      padding: var(--space-5);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stats-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-4);
+    }
+
+    .stats-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--gray-600);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .stats-menu {
+      background: none;
+      border: none;
+      color: var(--gray-500);
+      font-size: 20px;
+      cursor: pointer;
+      padding: var(--space-2);
+      border-radius: var(--radius);
+    }
+
+    .stats-menu:hover {
+      background: var(--gray-100);
+    }
+
+    .stats-value {
+      font-size: 48px;
+      font-weight: 700;
+      color: var(--primary);
+      line-height: 1;
+      margin-bottom: var(--space-3);
+    }
+
+    .stats-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: 6px 12px;
+      background: var(--success-light);
+      color: var(--success);
+      border-radius: var(--radius);
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: var(--space-2);
+    }
+
+    .stats-badge.negative {
+      background: var(--danger-light);
+      color: var(--danger);
+    }
+
+    .stats-description {
+      font-size: 14px;
+      color: var(--gray-600);
+      margin-bottom: var(--space-4);
+    }
+
+    .stats-footer {
+      font-size: 12px;
+      color: var(--gray-500);
+      padding-top: var(--space-4);
+      border-top: 1px solid var(--gray-200);
+    }
+
+    .stats-icon {
+      position: absolute;
+      right: var(--space-5);
+      top: var(--space-5);
+      font-size: 64px;
+      opacity: 0.1;
+    }
+
+    /* ============================================
+       CHART WIDGETS
+       ============================================ */
+    .chart-widget {
+      background: white;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--gray-200);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .chart-container {
+      padding: var(--space-5);
+      min-height: 300px;
+    }
+
+    canvas {
+      max-width: 100%;
+      height: auto !important;
+    }
+
+    @media (max-width: 768px) {
+      .grid-2, .grid-3, .grid-4 {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-brand">📦 Widgets Library + Charts 📊</div>
+  </nav>
+
+  <div class="container">
+
+    <!-- ============================================
+         1. STATS WIDGETS (Original)
+         ============================================ -->
+    <section class="section">
+      <h2 class="section-title">1. Stats Widgets</h2>
+      <div class="grid grid-4">
+        
+        <div class="stats-widget">
+          <div class="stats-icon">💰</div>
+          <div class="stats-header">
+            <div class="stats-label">Total Orders</div>
+            <button class="stats-menu">⋮</button>
+          </div>
+          <div class="stats-value" id="orders-value">302</div>
+          <div class="stats-badge">↑ +12%</div>
+          <div class="stats-description">Compare to last week</div>
+          <div class="stats-footer">Last updated: Just now</div>
+        </div>
+
+        <div class="stats-widget">
+          <div class="stats-icon">👥</div>
+          <div class="stats-header">
+            <div class="stats-label">Active Users</div>
+            <button class="stats-menu">⋮</button>
+          </div>
+          <div class="stats-value" id="users-value">1,234</div>
+          <div class="stats-badge">↑ +8%</div>
+          <div class="stats-description">3 pending registrations</div>
+          <div class="stats-footer">Real-time data</div>
+        </div>
+
+        <div class="stats-widget">
+          <div class="stats-icon">📈</div>
+          <div class="stats-header">
+            <div class="stats-label">Revenue</div>
+            <button class="stats-menu">⋮</button>
+          </div>
+          <div class="stats-value" id="revenue-value">$54.2k</div>
+          <div class="stats-badge negative">↓ -3%</div>
+          <div class="stats-description">Compare to last month</div>
+          <div class="stats-footer">Updated 2 hours ago</div>
+        </div>
+
+        <div class="stats-widget">
+          <div class="stats-icon">📊</div>
+          <div class="stats-header">
+            <div class="stats-label">Conversion</div>
+            <button class="stats-menu">⋮</button>
+          </div>
+          <div class="stats-value" id="conversion-value">3.4%</div>
+          <div class="stats-badge">↑ +0.4%</div>
+          <div class="stats-description">Above average</div>
+          <div class="stats-footer">Last 30 days</div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============================================
+         2. CHART.JS CHARTS
+         ============================================ -->
+    <section class="section">
+      <h2 class="section-title">2. Chart.js Charts</h2>
+      <div class="grid grid-2">
+        
+        <!-- Line Chart -->
+        <div class="chart-widget">
+          <div class="widget-header">
+            <div class="widget-title">📈 Sales Trend - Line Chart</div>
+          </div>
+          <div class="chart-container">
+            <canvas id="lineChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Bar Chart -->
+        <div class="chart-widget">
+          <div class="widget-header">
+            <div class="widget-title">📊 Visitors Comparison - Bar Chart</div>
+          </div>
+          <div class="chart-container">
+            <canvas id="barChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Pie Chart -->
+        <div class="chart-widget">
+          <div class="widget-header">
+            <div class="widget-title">🍰 Traffic Sources - Pie Chart</div>
+          </div>
+          <div class="chart-container">
+            <canvas id="pieChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Doughnut Chart -->
+        <div class="chart-widget">
+          <div class="widget-header">
+            <div class="widget-title">🍩 User Types - Doughnut Chart</div>
+          </div>
+          <div class="chart-container">
+            <canvas id="doughnutChart"></canvas>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============================================
+         3. APEXCHARTS
+         ============================================ -->
+    <section class="section">
+      <h2 class="section-title">3. ApexCharts - Advanced Charts</h2>
+      <div class="grid grid-2">
+        
+        <!-- Area Chart -->
+        <div class="chart-widget">
+          <div class="widget-header">
+            <div class="widget-title">📉 Revenue Over Time - Area Chart</div>
+          </div>
+          <div class="chart-container">
+            <div id="apexAreaChart"></div>
+          </div>
+        </div>
+
+        <!-- Column Chart -->
+        <div class="chart-widget">
+          <div class="widget-header">
+            <div class="widget-title">📊 Quarterly Profit - Column Chart</div>
+          </div>
+          <div class="chart-container">
+            <div id="apexColumnChart"></div>
+          </div>
+        </div>
+
+        <!-- Radial Bar Chart -->
+        <div class="chart-widget">
+          <div class="widget-header">
+            <div class="widget-title">🎯 Goals Progress - Radial Chart</div>
+          </div>
+          <div class="chart-container">
+            <div id="apexRadialChart"></div>
+          </div>
+        </div>
+
+        <!-- Mixed Chart -->
+        <div class="chart-widget">
+          <div class="widget-header">
+            <div class="widget-title">📈 Mixed Data - Line + Column</div>
+          </div>
+          <div class="chart-container">
+            <div id="apexMixedChart"></div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Chart.js Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  
+  <!-- ApexCharts Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/apexcharts/3.45.1/apexcharts.min.js"></script>
+
+  <script>
+    // ============================================
+    // STATS AUTO-UPDATE (Original Feature)
+    // ============================================
+    setInterval(() => {
+      const ordersEl = document.getElementById('orders-value');
+      const usersEl = document.getElementById('users-value');
+      
+      if (ordersEl) {
+        let val = parseInt(ordersEl.textContent);
+        ordersEl.textContent = val + Math.floor(Math.random() * 5);
+      }
+      
+      if (usersEl) {
+        let val = parseInt(usersEl.textContent.replace(',', ''));
+        usersEl.textContent = (val + Math.floor(Math.random() * 10)).toLocaleString();
+      }
+    }, 5000);
+
+    // ============================================
+    // CHART.JS CHARTS
+    // ============================================
+    
+    // Line Chart
+    const lineCtx = document.getElementById('lineChart');
+    if (lineCtx) {
+      new Chart(lineCtx, {
+        type: 'line',
+        data: {
+          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+          datasets: [{
+            label: 'Total Sales',
+            data: [12000, 19000, 15000, 25000, 22000, 30000],
+            borderColor: '#2563eb',
+            backgroundColor: 'rgba(37, 99, 235, 0.1)',
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4,
+            pointRadius: 5,
+            pointHoverRadius: 7,
+            pointBackgroundColor: '#2563eb',
+            pointBorderColor: '#fff',
+            pointBorderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: true, position: 'top' },
+            tooltip: { 
+              backgroundColor: '#1f2937',
+              padding: 12,
+              titleColor: '#fff',
+              bodyColor: '#fff',
+              borderColor: '#374151',
+              borderWidth: 1
+            }
+          },
+          scales: {
+            y: { 
+              beginAtZero: true,
+              ticks: { 
+                callback: function(value) {
+                  return '$' + (value/1000) + 'k';
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Bar Chart
+    const barCtx = document.getElementById('barChart');
+    if (barCtx) {
+      new Chart(barCtx, {
+        type: 'bar',
+        data: {
+          labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+          datasets: [{
+            label: 'Total Visitors',
+            data: [370, 310, 360, 340, 430, 310, 280],
+            backgroundColor: 'rgba(37, 99, 235, 0.8)',
+            borderColor: '#2563eb',
+            borderWidth: 2,
+            borderRadius: 8
+          }, {
+            label: 'New Visitors',
+            data: [120, 160, 200, 140, 230, 210, 150],
+            backgroundColor: 'rgba(22, 163, 74, 0.8)',
+            borderColor: '#16a34a',
+            borderWidth: 2,
+            borderRadius: 8
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: true, position: 'top' }
+          },
+          scales: {
+            y: { beginAtZero: true }
+          }
+        }
+      });
+    }
+
+    // Pie Chart
+    const pieCtx = document.getElementById('pieChart');
+    if (pieCtx) {
+      new Chart(pieCtx, {
+        type: 'pie',
+        data: {
+          labels: ['Direct', 'Social Media', 'Referral', 'Email'],
+          datasets: [{
+            data: [300, 150, 100, 80],
+            backgroundColor: [
+              '#2563eb',
+              '#16a34a',
+              '#f59e0b',
+              '#ec4899'
+            ],
+            borderWidth: 2,
+            borderColor: '#fff'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { 
+              display: true, 
+              position: 'bottom',
+              labels: { padding: 15 }
+            }
+          }
+        }
+      });
+    }
+
+    // Doughnut Chart
+    const doughnutCtx = document.getElementById('doughnutChart');
+    if (doughnutCtx) {
+      new Chart(doughnutCtx, {
+        type: 'doughnut',
+        data: {
+          labels: ['New Users', 'Returning Users', 'Inactive'],
+          datasets: [{
+            data: [450, 280, 120],
+            backgroundColor: [
+              'rgba(37, 99, 235, 0.8)',
+              'rgba(37, 99, 235, 0.5)',
+              'rgba(37, 99, 235, 0.2)'
+            ],
+            borderWidth: 2,
+            borderColor: '#fff'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { 
+              display: true, 
+              position: 'bottom',
+              labels: { padding: 15 }
+            }
+          }
+        }
+      });
+    }
+
+    // ============================================
+    // APEXCHARTS
+    // ============================================
+
+    // Area Chart
+    const apexAreaOptions = {
+      chart: {
+        height: 300,
+        type: 'area',
+        toolbar: { show: false },
+        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+      },
+      dataLabels: { enabled: false },
+      stroke: { 
+        curve: 'smooth',
+        width: 3
+      },
+      colors: ['#14b8a6', '#6b7280'],
+      series: [{
+        name: 'Revenue',
+        data: [31000, 40000, 28000, 51000, 42000, 109000, 100000]
+      }, {
+        name: 'Expenses',
+        data: [11000, 32000, 45000, 32000, 34000, 52000, 41000]
+      }],
+      xaxis: {
+        categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul']
+      },
+      yaxis: {
+        labels: {
+          formatter: function(val) {
+            return '$' + (val/1000) + 'k';
+          }
+        }
+      },
+      legend: {
+        position: 'top',
+        horizontalAlign: 'left'
+      },
+      fill: {
+        type: 'gradient',
+        gradient: {
+          shadeIntensity: 1,
+          opacityFrom: 0.7,
+          opacityTo: 0.2
+        }
+      }
+    };
+    
+    const apexAreaChart = new ApexCharts(
+      document.querySelector('#apexAreaChart'),
+      apexAreaOptions
+    );
+    apexAreaChart.render();
+
+    // Column Chart
+    const apexColumnOptions = {
+      chart: {
+        height: 300,
+        type: 'bar',
+        toolbar: { show: false }
+      },
+      plotOptions: {
+        bar: {
+          borderRadius: 8,
+          columnWidth: '60%'
+        }
+      },
+      dataLabels: { enabled: false },
+      colors: ['#2563eb', '#6366f1', '#6b7280'],
+      series: [{
+        name: 'Q1',
+        data: [44000, 55000, 57000, 56000]
+      }, {
+        name: 'Q2',
+        data: [76000, 85000, 101000, 98000]
+      }, {
+        name: 'Q3',
+        data: [35000, 41000, 36000, 26000]
+      }],
+      xaxis: {
+        categories: ['Product A', 'Product B', 'Product C', 'Product D']
+      },
+      yaxis: {
+        labels: {
+          formatter: function(val) {
+            return '$' + (val/1000) + 'k';
+          }
+        }
+      },
+      legend: {
+        position: 'top',
+        horizontalAlign: 'left'
+      }
+    };
+    
+    const apexColumnChart = new ApexCharts(
+      document.querySelector('#apexColumnChart'),
+      apexColumnOptions
+    );
+    apexColumnChart.render();
+
+    // Radial Bar Chart
+    const apexRadialOptions = {
+      chart: {
+        height: 300,
+        type: 'radialBar'
+      },
+      plotOptions: {
+        radialBar: {
+          offsetY: 0,
+          startAngle: 0,
+          endAngle: 270,
+          hollow: {
+            margin: 5,
+            size: '35%',
+            background: 'transparent'
+          },
+          dataLabels: {
+            name: { 
+              show: true,
+              fontSize: '14px'
+            },
+            value: { 
+              show: true,
+              fontSize: '22px',
+              fontWeight: 700
+            }
+          }
+        }
+      },
+      colors: ['#06b6d4', '#2563eb', '#6366f1', '#d1d5db'],
+      series: [76, 67, 61, 90],
+      labels: ['Sales', 'Marketing', 'Support', 'Development'],
+      legend: {
+        show: true,
+        position: 'bottom',
+        fontSize: '13px',
+        markers: { size: 6 }
+      }
+    };
+    
+    const apexRadialChart = new ApexCharts(
+      document.querySelector('#apexRadialChart'),
+      apexRadialOptions
+    );
+    apexRadialChart.render();
+
+    // Mixed Chart
+    const apexMixedOptions = {
+      chart: {
+        height: 300,
+        type: 'line',
+        toolbar: { show: false }
+      },
+      stroke: {
+        width: [0, 0, 3],
+        curve: 'smooth'
+      },
+      plotOptions: {
+        bar: {
+          columnWidth: '50%',
+          borderRadius: 6
+        }
+      },
+      colors: ['#2563eb', '#16a34a', '#f59e0b'],
+      series: [{
+        name: 'Orders',
+        type: 'column',
+        data: [23, 42, 35, 27, 43, 22, 17, 31]
+      }, {
+        name: 'Shipped',
+        type: 'column',
+        data: [20, 38, 32, 24, 40, 20, 15, 28]
+      }, {
+        name: 'Revenue',
+        type: 'line',
+        data: [30, 55, 45, 35, 60, 30, 25, 40]
+      }],
+      xaxis: {
+        categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug']
+      },
+      yaxis: {
+        labels: {
+          formatter: function(val) {
+            return val.toFixed(0);
+          }
+        }
+      },
+      legend: {
+        position: 'top',
+        horizontalAlign: 'left'
+      },
+      dataLabels: { enabled: false }
+    };
+    
+    const apexMixedChart = new ApexCharts(
+      document.querySelector('#apexMixedChart'),
+      apexMixedOptions
+    );
+    apexMixedChart.render();
+
+    // Console Info
+    console.log(`
+📦 Widgets Library v2.0 - NOW WITH CHARTS!
+✨ Pure Vanilla JavaScript + Chart.js + ApexCharts
+
+📊 Chart Types Available:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Chart.js:
+  ✓ Line Chart (Sales Trend)
+  ✓ Bar Chart (Visitors Comparison)
+  ✓ Pie Chart (Traffic Sources)
+  ✓ Doughnut Chart (User Types)
+
+ApexCharts:
+  ✓ Area Chart (Revenue Over Time)
+  ✓ Column Chart (Quarterly Profit)
+  ✓ Radial Bar Chart (Goals Progress)
+  ✓ Mixed Chart (Line + Column)
+
+💡 Features:
+  - Zero Dependencies (just CDN links)
+  - Fully Responsive
+  - Interactive & Animated
+  - Live Stats Updates (every 5 seconds)
+  - Modern Design System
+  - Production Ready!
+
+🎯 Total Components: 12+ Charts + Original Widgets
+    `);
+  </script>
+
+</body>
+</html>

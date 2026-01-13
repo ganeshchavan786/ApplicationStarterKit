@@ -27,6 +27,7 @@ class UserUpdate(BaseModel):
     last_name: Optional[str] = Field(None, min_length=2, max_length=100)
     phone: Optional[str] = None
     avatar: Optional[str] = None
+    is_active: Optional[bool] = None
 
 
 class UserRoleUpdate(BaseModel):

@@ -1,0 +1,1836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Advanced UI Kit - Component Library</title>
+  <style>
+    /* ============================================
+       DESIGN TOKENS
+       ============================================ */
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --primary-light: #dbeafe;
+      --success: #16a34a;
+      --success-hover: #15803d;
+      --success-light: #dcfce7;
+      --danger: #dc2626;
+      --danger-hover: #b91c1c;
+      --danger-light: #fee2e2;
+      --warning: #f59e0b;
+      --warning-hover: #d97706;
+      --warning-light: #fef3c7;
+      --info: #0ea5e9;
+      --info-hover: #0284c7;
+      --info-light: #e0f2fe;
+      --purple: #9333ea;
+      --purple-light: #f3e8ff;
+      --pink: #ec4899;
+      --pink-light: #fce7f3;
+      
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-300: #d1d5db;
+      --gray-400: #9ca3af;
+      --gray-500: #6b7280;
+      --gray-600: #4b5563;
+      --gray-700: #374151;
+      --gray-800: #1f2937;
+      --gray-900: #111827;
+      
+      --radius-sm: 4px;
+      --radius: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+      --radius-full: 9999px;
+      
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      --shadow-md: 0 6px 12px -2px rgba(0, 0, 0, 0.15);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+      
+      --space-1: 4px;
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-5: 20px;
+      --space-6: 24px;
+      --space-8: 32px;
+      --space-10: 40px;
+      --space-12: 48px;
+      
+      --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-mono: 'SF Mono', Monaco, 'Courier New', monospace;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: var(--font-sans);
+      background: var(--gray-50);
+      color: var(--gray-900);
+      line-height: 1.6;
+    }
+
+    /* ============================================
+       LAYOUT
+       ============================================ */
+    .navbar {
+      background: white;
+      border-bottom: 1px solid var(--gray-200);
+      padding: var(--space-4) var(--space-6);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .navbar-brand {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    .navbar-nav {
+      display: flex;
+      gap: var(--space-4);
+      list-style: none;
+    }
+
+    .navbar-nav a {
+      color: var(--gray-600);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 14px;
+      transition: color 0.2s;
+    }
+
+    .navbar-nav a:hover {
+      color: var(--primary);
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: var(--space-8) var(--space-6);
+    }
+
+    .section {
+      margin-bottom: var(--space-12);
+      background: white;
+      padding: var(--space-8);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--gray-200);
+    }
+
+    .section-header {
+      margin-bottom: var(--space-6);
+      padding-bottom: var(--space-4);
+      border-bottom: 2px solid var(--gray-200);
+    }
+
+    .section-title {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--gray-900);
+      margin-bottom: var(--space-2);
+    }
+
+    .section-description {
+      color: var(--gray-600);
+      font-size: 16px;
+    }
+
+    .component-group {
+      margin-bottom: var(--space-8);
+    }
+
+    .component-group:last-child {
+      margin-bottom: 0;
+    }
+
+    .component-title {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: var(--space-4);
+      color: var(--gray-800);
+    }
+
+    .component-preview {
+      background: var(--gray-50);
+      padding: var(--space-6);
+      border-radius: var(--radius);
+      border: 1px solid var(--gray-200);
+      margin-bottom: var(--space-4);
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-4);
+      align-items: center;
+    }
+
+    .code-block {
+      background: var(--gray-900);
+      color: #e5e7eb;
+      padding: var(--space-4);
+      border-radius: var(--radius);
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .grid {
+      display: grid;
+      gap: var(--space-4);
+    }
+
+    .grid-2 { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+    .grid-3 { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+    .grid-4 { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+
+    /* ============================================
+       BUTTONS
+       ============================================ */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 20px;
+      font-size: 14px;
+      font-weight: 500;
+      border-radius: var(--radius);
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      gap: var(--space-2);
+      font-family: inherit;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn:active:not(:disabled) {
+      transform: scale(0.98);
+    }
+
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover:not(:disabled) { background: var(--primary-hover); }
+    
+    .btn-success { background: var(--success); color: white; }
+    .btn-success:hover:not(:disabled) { background: var(--success-hover); }
+    
+    .btn-danger { background: var(--danger); color: white; }
+    .btn-danger:hover:not(:disabled) { background: var(--danger-hover); }
+    
+    .btn-warning { background: var(--warning); color: white; }
+    .btn-warning:hover:not(:disabled) { background: var(--warning-hover); }
+    
+    .btn-info { background: var(--info); color: white; }
+    .btn-info:hover:not(:disabled) { background: var(--info-hover); }
+    
+    .btn-purple { background: var(--purple); color: white; }
+    .btn-purple:hover:not(:disabled) { background: #7c3aed; }
+    
+    .btn-pink { background: var(--pink); color: white; }
+    .btn-pink:hover:not(:disabled) { background: #db2777; }
+    
+    .btn-secondary { background: var(--gray-200); color: var(--gray-900); }
+    .btn-secondary:hover:not(:disabled) { background: var(--gray-300); }
+    
+    .btn-outline {
+      background: transparent;
+      border: 2px solid var(--primary);
+      color: var(--primary);
+    }
+    .btn-outline:hover:not(:disabled) {
+      background: var(--primary);
+      color: white;
+    }
+    
+    .btn-ghost {
+      background: transparent;
+      color: var(--gray-700);
+    }
+    .btn-ghost:hover:not(:disabled) {
+      background: var(--gray-100);
+    }
+
+    .btn-sm { padding: 6px 12px; font-size: 13px; }
+    .btn-lg { padding: 14px 28px; font-size: 16px; }
+    .btn-xl { padding: 18px 36px; font-size: 18px; }
+
+    .btn-rounded { border-radius: var(--radius-full); }
+    .btn-square { border-radius: var(--radius-sm); }
+
+    .btn-icon {
+      width: 40px;
+      height: 40px;
+      padding: 0;
+      border-radius: var(--radius);
+    }
+
+    .btn-group {
+      display: inline-flex;
+      gap: 0;
+    }
+
+    .btn-group .btn {
+      border-radius: 0;
+      border-right: 1px solid rgba(255,255,255,0.3);
+    }
+
+    .btn-group .btn:first-child {
+      border-radius: var(--radius) 0 0 var(--radius);
+    }
+
+    .btn-group .btn:last-child {
+      border-radius: 0 var(--radius) var(--radius) 0;
+      border-right: none;
+    }
+
+    /* ============================================
+       CARDS
+       ============================================ */
+    .card {
+      background: white;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--gray-200);
+      overflow: hidden;
+      transition: all 0.2s;
+    }
+
+    .card:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+
+    .card-header {
+      padding: var(--space-4) var(--space-5);
+      border-bottom: 1px solid var(--gray-200);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .card-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--gray-900);
+    }
+
+    .card-body {
+      padding: var(--space-5);
+    }
+
+    .card-footer {
+      padding: var(--space-4) var(--space-5);
+      border-top: 1px solid var(--gray-200);
+      background: var(--gray-50);
+      display: flex;
+      gap: var(--space-3);
+      justify-content: flex-end;
+    }
+
+    .card-img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+
+    .card-elevated {
+      box-shadow: var(--shadow-lg);
+    }
+
+    .card-bordered {
+      border: 2px solid var(--primary);
+    }
+
+    /* ============================================
+       ICONS (SVG Based)
+       ============================================ */
+    .icon {
+      display: inline-flex;
+      width: 20px;
+      height: 20px;
+    }
+
+    .icon-sm { width: 16px; height: 16px; }
+    .icon-lg { width: 24px; height: 24px; }
+    .icon-xl { width: 32px; height: 32px; }
+
+    .icon-circle {
+      padding: var(--space-2);
+      background: var(--primary-light);
+      border-radius: var(--radius-full);
+      color: var(--primary);
+    }
+
+    .icon-square {
+      padding: var(--space-2);
+      background: var(--gray-100);
+      border-radius: var(--radius);
+    }
+
+    /* ============================================
+       MODALS
+       ============================================ */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+      padding: var(--space-4);
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .modal {
+      background: white;
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-xl);
+      transform: scale(0.9);
+      transition: transform 0.3s;
+    }
+
+    .modal-overlay.active .modal {
+      transform: scale(1);
+    }
+
+    .modal-header {
+      padding: var(--space-5);
+      border-bottom: 1px solid var(--gray-200);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-title {
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: var(--gray-400);
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius);
+      transition: all 0.2s;
+    }
+
+    .modal-close:hover {
+      background: var(--gray-100);
+      color: var(--gray-900);
+    }
+
+    .modal-body {
+      padding: var(--space-5);
+    }
+
+    .modal-footer {
+      padding: var(--space-5);
+      border-top: 1px solid var(--gray-200);
+      display: flex;
+      gap: var(--space-3);
+      justify-content: flex-end;
+    }
+
+    /* ============================================
+       NOTIFICATIONS (Toast)
+       ============================================ */
+    .toast-container {
+      position: fixed;
+      top: var(--space-6);
+      right: var(--space-6);
+      z-index: 2000;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    .toast {
+      background: white;
+      border-radius: var(--radius-lg);
+      padding: var(--space-4);
+      box-shadow: var(--shadow-lg);
+      border-left: 4px solid var(--primary);
+      min-width: 320px;
+      display: flex;
+      align-items: start;
+      gap: var(--space-3);
+      animation: slideInRight 0.3s ease;
+    }
+
+    .toast-success { border-left-color: var(--success); }
+    .toast-error { border-left-color: var(--danger); }
+    .toast-warning { border-left-color: var(--warning); }
+    .toast-info { border-left-color: var(--info); }
+
+    .toast-icon {
+      flex-shrink: 0;
+      width: 24px;
+      height: 24px;
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .toast-success .toast-icon {
+      background: var(--success-light);
+      color: var(--success);
+    }
+
+    .toast-error .toast-icon {
+      background: var(--danger-light);
+      color: var(--danger);
+    }
+
+    .toast-warning .toast-icon {
+      background: var(--warning-light);
+      color: var(--warning);
+    }
+
+    .toast-info .toast-icon {
+      background: var(--info-light);
+      color: var(--info);
+    }
+
+    .toast-content {
+      flex: 1;
+    }
+
+    .toast-title {
+      font-weight: 600;
+      margin-bottom: var(--space-1);
+      font-size: 14px;
+    }
+
+    .toast-message {
+      font-size: 13px;
+      color: var(--gray-600);
+    }
+
+    @keyframes slideInRight {
+      from {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    /* ============================================
+       ALERTS
+       ============================================ */
+    .alert {
+      padding: var(--space-4);
+      border-radius: var(--radius);
+      border: 1px solid;
+      display: flex;
+      align-items: start;
+      gap: var(--space-3);
+    }
+
+    .alert-primary {
+      background: var(--primary-light);
+      border-color: var(--primary);
+      color: var(--primary-hover);
+    }
+
+    .alert-success {
+      background: var(--success-light);
+      border-color: var(--success);
+      color: var(--success-hover);
+    }
+
+    .alert-danger {
+      background: var(--danger-light);
+      border-color: var(--danger);
+      color: var(--danger-hover);
+    }
+
+    .alert-warning {
+      background: var(--warning-light);
+      border-color: var(--warning);
+      color: var(--warning-hover);
+    }
+
+    .alert-info {
+      background: var(--info-light);
+      border-color: var(--info);
+      color: var(--info-hover);
+    }
+
+    /* ============================================
+       TYPOGRAPHY
+       ============================================ */
+    .h1 { font-size: 48px; font-weight: 800; line-height: 1.2; }
+    .h2 { font-size: 40px; font-weight: 700; line-height: 1.2; }
+    .h3 { font-size: 32px; font-weight: 700; line-height: 1.3; }
+    .h4 { font-size: 24px; font-weight: 600; line-height: 1.4; }
+    .h5 { font-size: 20px; font-weight: 600; line-height: 1.5; }
+    .h6 { font-size: 16px; font-weight: 600; line-height: 1.5; }
+
+    .text-muted { color: var(--gray-500); }
+    .text-primary { color: var(--primary); }
+    .text-success { color: var(--success); }
+    .text-danger { color: var(--danger); }
+    .text-warning { color: var(--warning); }
+
+    .text-sm { font-size: 14px; }
+    .text-xs { font-size: 12px; }
+    .text-lg { font-size: 18px; }
+    .text-xl { font-size: 20px; }
+
+    .font-bold { font-weight: 700; }
+    .font-semibold { font-weight: 600; }
+    .font-medium { font-weight: 500; }
+
+    .lead {
+      font-size: 20px;
+      font-weight: 300;
+      line-height: 1.6;
+      color: var(--gray-600);
+    }
+
+    /* ============================================
+       TABS
+       ============================================ */
+    .tabs {
+      border-bottom: 2px solid var(--gray-200);
+      display: flex;
+      gap: var(--space-4);
+    }
+
+    .tab {
+      padding: var(--space-3) var(--space-4);
+      cursor: pointer;
+      color: var(--gray-600);
+      font-weight: 500;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      transition: all 0.2s;
+    }
+
+    .tab:hover {
+      color: var(--primary);
+    }
+
+    .tab.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    .tab-content {
+      padding: var(--space-5) 0;
+    }
+
+    .tab-pane {
+      display: none;
+    }
+
+    .tab-pane.active {
+      display: block;
+      animation: fadeIn 0.3s;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ============================================
+       ACCORDIONS
+       ============================================ */
+    .accordion {
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+
+    .accordion-item {
+      border-bottom: 1px solid var(--gray-200);
+    }
+
+    .accordion-item:last-child {
+      border-bottom: none;
+    }
+
+    .accordion-header {
+      padding: var(--space-4);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 600;
+      background: white;
+      transition: background 0.2s;
+    }
+
+    .accordion-header:hover {
+      background: var(--gray-50);
+    }
+
+    .accordion-icon {
+      transition: transform 0.3s;
+      font-size: 20px;
+    }
+
+    .accordion-item.active .accordion-icon {
+      transform: rotate(180deg);
+    }
+
+    .accordion-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+
+    .accordion-item.active .accordion-body {
+      max-height: 500px;
+    }
+
+    .accordion-content {
+      padding: var(--space-4);
+      color: var(--gray-600);
+    }
+
+    /* ============================================
+       BADGES
+       ============================================ */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 12px;
+      font-size: 12px;
+      font-weight: 500;
+      border-radius: var(--radius-full);
+      gap: var(--space-1);
+    }
+
+    .badge-primary { background: var(--primary-light); color: var(--primary); }
+    .badge-success { background: var(--success-light); color: var(--success); }
+    .badge-danger { background: var(--danger-light); color: var(--danger); }
+    .badge-warning { background: var(--warning-light); color: var(--warning); }
+    .badge-info { background: var(--info-light); color: var(--info); }
+    .badge-purple { background: var(--purple-light); color: var(--purple); }
+    .badge-pink { background: var(--pink-light); color: var(--pink); }
+    .badge-gray { background: var(--gray-200); color: var(--gray-700); }
+
+    .badge-outline {
+      background: transparent;
+      border: 1px solid currentColor;
+    }
+
+    .badge-lg { padding: 6px 16px; font-size: 14px; }
+    .badge-dot {
+      padding: 6px;
+      border-radius: var(--radius-full);
+    }
+
+    /* ============================================
+       UTILITIES
+       ============================================ */
+    .hidden { display: none !important; }
+    .mb-4 { margin-bottom: var(--space-4); }
+    .mt-4 { margin-top: var(--space-4); }
+    .text-center { text-align: center; }
+
+    @media (max-width: 768px) {
+      .navbar-nav { display: none; }
+      .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-brand">🎨 Advanced UI Kit</div>
+    <ul class="navbar-nav">
+      <li><a href="#buttons">Buttons</a></li>
+      <li><a href="#cards">Cards</a></li>
+      <li><a href="#icons">Icons</a></li>
+      <li><a href="#modals">Modals</a></li>
+      <li><a href="#typography">Typography</a></li>
+      <li><a href="#tabs">Tabs & Accordions</a></li>
+    </ul>
+  </nav>
+
+  <div class="container">
+
+    <!-- ============================================
+         1. BUTTONS SECTION
+         ============================================ -->
+    <section class="section" id="buttons">
+      <div class="section-header">
+        <h2 class="section-title">Buttons</h2>
+        <p class="section-description">Various button styles, sizes, and states for all actions</p>
+      </div>
+
+      <!-- Button Colors -->
+      <div class="component-group">
+        <h3 class="component-title">Button Colors</h3>
+        <div class="component-preview">
+          <div class="btn-group">
+            <button class="btn btn-primary">Left</button>
+            <button class="btn btn-primary">Center</button>
+            <button class="btn btn-primary">Right</button>
+          </div>
+          <div class="btn-group">
+            <button class="btn btn-secondary">Copy</button>
+            <button class="btn btn-secondary">Paste</button>
+            <button class="btn btn-secondary">Cut</button>
+          </div>
+        </div>
+        <div class="code-block">&lt;div class="btn-group"&gt;
+  &lt;button class="btn"&gt;Left&lt;/button&gt;
+  &lt;button class="btn"&gt;Center&lt;/button&gt;
+  &lt;button class="btn"&gt;Right&lt;/button&gt;
+&lt;/div&gt;</div>
+      </div>
+    </section>
+
+    <!-- ============================================
+         2. CARDS SECTION
+         ============================================ -->
+    <section class="section" id="cards">
+      <div class="section-header">
+        <h2 class="section-title">Cards</h2>
+        <p class="section-description">Flexible content containers with multiple variants</p>
+      </div>
+
+      <!-- Basic Cards -->
+      <div class="component-group">
+        <h3 class="component-title">Basic Cards</h3>
+        <div class="grid grid-3">
+          <div class="card">
+            <div class="card-header">
+              <h4 class="card-title">Card Title</h4>
+            </div>
+            <div class="card-body">
+              <p>This is a basic card with header and body content. Perfect for displaying information in a structured way.</p>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-body">
+              <h4 class="card-title mb-4">Simple Card</h4>
+              <p>Card without header, just body content. Clean and minimal design.</p>
+            </div>
+            <div class="card-footer">
+              <button class="btn btn-sm btn-primary">Action</button>
+            </div>
+          </div>
+
+          <div class="card card-elevated">
+            <div class="card-body">
+              <h4 class="card-title mb-4">Elevated Card</h4>
+              <p>Card with elevated shadow effect for better depth perception.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cards with Images -->
+      <div class="component-group">
+        <h3 class="component-title">Cards with Images</h3>
+        <div class="grid grid-3">
+          <div class="card">
+            <svg class="card-img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200">
+              <rect fill="#dbeafe" width="400" height="200"/>
+              <text x="50%" y="50%" text-anchor="middle" dy="0.35em" fill="#2563eb" font-size="20" font-weight="600">Image Placeholder</text>
+            </svg>
+            <div class="card-body">
+              <h4 class="card-title mb-4">Product Card</h4>
+              <p class="text-muted">Beautiful product with amazing features and great design.</p>
+            </div>
+            <div class="card-footer">
+              <button class="btn btn-sm btn-primary">View Details</button>
+              <button class="btn btn-sm btn-outline">Add to Cart</button>
+            </div>
+          </div>
+
+          <div class="card card-bordered">
+            <svg class="card-img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200">
+              <rect fill="#dcfce7" width="400" height="200"/>
+              <text x="50%" y="50%" text-anchor="middle" dy="0.35em" fill="#16a34a" font-size="20" font-weight="600">Featured Image</text>
+            </svg>
+            <div class="card-body">
+              <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+                <h4 class="card-title">Featured Item</h4>
+                <span class="badge badge-success">New</span>
+              </div>
+              <p class="text-muted">Special featured product with border highlight.</p>
+            </div>
+          </div>
+
+          <div class="card">
+            <svg class="card-img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200">
+              <rect fill="#fef3c7" width="400" height="200"/>
+              <text x="50%" y="50%" text-anchor="middle" dy="0.35em" fill="#f59e0b" font-size="20" font-weight="600">Cover Image</text>
+            </svg>
+            <div class="card-body">
+              <h4 class="card-title mb-4">Blog Post</h4>
+              <p class="text-muted text-sm">Posted on Jan 11, 2026 • 5 min read</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats Cards -->
+      <div class="component-group">
+        <h3 class="component-title">Stats Cards</h3>
+        <div class="grid grid-4">
+          <div class="card">
+            <div class="card-body">
+              <div style="display: flex; justify-content: space-between; align-items: start;">
+                <div>
+                  <p class="text-muted text-sm">Total Users</p>
+                  <h3 class="h3" style="margin-top: 8px;">12,345</h3>
+                  <p class="text-success text-sm" style="margin-top: 8px;">↑ 12% from last month</p>
+                </div>
+                <div style="font-size: 32px;">👥</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-body">
+              <div style="display: flex; justify-content: space-between; align-items: start;">
+                <div>
+                  <p class="text-muted text-sm">Revenue</p>
+                  <h3 class="h3" style="margin-top: 8px;">$54,239</h3>
+                  <p class="text-success text-sm" style="margin-top: 8px;">↑ 8% increase</p>
+                </div>
+                <div style="font-size: 32px;">💰</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-body">
+              <div style="display: flex; justify-content: space-between; align-items: start;">
+                <div>
+                  <p class="text-muted text-sm">Orders</p>
+                  <h3 class="h3" style="margin-top: 8px;">892</h3>
+                  <p class="text-danger text-sm" style="margin-top: 8px;">↓ 3% decrease</p>
+                </div>
+                <div style="font-size: 32px;">📦</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-body">
+              <div style="display: flex; justify-content: space-between; align-items: start;">
+                <div>
+                  <p class="text-muted text-sm">Conversion</p>
+                  <h3 class="h3" style="margin-top: 8px;">3.4%</h3>
+                  <p class="text-success text-sm" style="margin-top: 8px;">↑ 0.4% up</p>
+                </div>
+                <div style="font-size: 32px;">📈</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================
+         3. ICONS SECTION
+         ============================================ -->
+    <section class="section" id="icons">
+      <div class="section-header">
+        <h2 class="section-title">Icons</h2>
+        <p class="section-description">Icon styles and decorative elements using emoji and SVG</p>
+      </div>
+
+      <!-- Emoji Icons -->
+      <div class="component-group">
+        <h3 class="component-title">Emoji Icons (Ready to Use)</h3>
+        <div class="component-preview">
+          <span style="font-size: 32px;">🏠</span>
+          <span style="font-size: 32px;">👤</span>
+          <span style="font-size: 32px;">⚙️</span>
+          <span style="font-size: 32px;">📧</span>
+          <span style="font-size: 32px;">🔔</span>
+          <span style="font-size: 32px;">❤️</span>
+          <span style="font-size: 32px;">⭐</span>
+          <span style="font-size: 32px;">🔍</span>
+          <span style="font-size: 32px;">📊</span>
+          <span style="font-size: 32px;">🎨</span>
+          <span style="font-size: 32px;">💼</span>
+          <span style="font-size: 32px;">🚀</span>
+        </div>
+        <div class="code-block">&lt;span style="font-size: 32px;"&gt;🏠&lt;/span&gt;
+&lt;span style="font-size: 32px;"&gt;⚙️&lt;/span&gt;</div>
+      </div>
+
+      <!-- Icon with Background -->
+      <div class="component-group">
+        <h3 class="component-title">Icons with Background</h3>
+        <div class="component-preview">
+          <div style="width: 48px; height: 48px; background: var(--primary-light); border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; font-size: 24px;">🏠</div>
+          <div style="width: 48px; height: 48px; background: var(--success-light); border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; font-size: 24px;">✓</div>
+          <div style="width: 48px; height: 48px; background: var(--danger-light); border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; font-size: 24px;">×</div>
+          <div style="width: 48px; height: 48px; background: var(--warning-light); border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; font-size: 24px;">⚠️</div>
+          <div style="width: 48px; height: 48px; background: var(--info-light); border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; font-size: 24px;">ℹ️</div>
+          <div style="width: 48px; height: 48px; background: var(--purple-light); border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; font-size: 24px;">⭐</div>
+        </div>
+      </div>
+
+      <!-- Icon Sizes -->
+      <div class="component-group">
+        <h3 class="component-title">Icon Sizes</h3>
+        <div class="component-preview">
+          <div style="width: 32px; height: 32px; background: var(--primary-light); border-radius: var(--radius); display: flex; align-items: center; justify-content: center; font-size: 16px; color: var(--primary);">📧</div>
+          <div style="width: 40px; height: 40px; background: var(--primary-light); border-radius: var(--radius); display: flex; align-items: center; justify-content: center; font-size: 20px; color: var(--primary);">📧</div>
+          <div style="width: 48px; height: 48px; background: var(--primary-light); border-radius: var(--radius); display: flex; align-items: center; justify-content: center; font-size: 24px; color: var(--primary);">📧</div>
+          <div style="width: 64px; height: 64px; background: var(--primary-light); border-radius: var(--radius); display: flex; align-items: center; justify-content: center; font-size: 32px; color: var(--primary);">📧</div>
+        </div>
+      </div>
+
+      <!-- Badges with Icons -->
+      <div class="component-group">
+        <h3 class="component-title">Badges (See more in Typography section)</h3>
+        <div class="component-preview">
+          <span class="badge badge-primary">✓ Verified</span>
+          <span class="badge badge-success">🎉 New</span>
+          <span class="badge badge-danger">🔥 Hot</span>
+          <span class="badge badge-warning">⚠️ Warning</span>
+          <span class="badge badge-info">ℹ️ Info</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================
+         4. MODALS & NOTIFICATIONS SECTION
+         ============================================ -->
+    <section class="section" id="modals">
+      <div class="section-header">
+        <h2 class="section-title">Modals & Notifications</h2>
+        <p class="section-description">Dialog boxes, alerts, and toast notifications</p>
+      </div>
+
+      <!-- Modal Trigger -->
+      <div class="component-group">
+        <h3 class="component-title">Modal Dialogs</h3>
+        <div class="component-preview">
+          <button class="btn btn-primary" onclick="openModal('modal-1')">Open Basic Modal</button>
+          <button class="btn btn-success" onclick="openModal('modal-2')">Open Form Modal</button>
+          <button class="btn btn-danger" onclick="openModal('modal-3')">Open Confirmation Modal</button>
+        </div>
+        <div class="code-block">&lt;button onclick="openModal('my-modal')"&gt;Open Modal&lt;/button&gt;
+
+&lt;div class="modal-overlay" id="my-modal"&gt;
+  &lt;div class="modal"&gt;
+    &lt;div class="modal-header"&gt;...&lt;/div&gt;
+    &lt;div class="modal-body"&gt;...&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</div>
+      </div>
+
+      <!-- Toast Notifications -->
+      <div class="component-group">
+        <h3 class="component-title">Toast Notifications</h3>
+        <div class="component-preview">
+          <button class="btn btn-success" onclick="showToast('success')">Success Toast</button>
+          <button class="btn btn-danger" onclick="showToast('error')">Error Toast</button>
+          <button class="btn btn-warning" onclick="showToast('warning')">Warning Toast</button>
+          <button class="btn btn-info" onclick="showToast('info')">Info Toast</button>
+        </div>
+        <div class="code-block">showToast('success'); // Function call
+// Toast appears automatically and disappears after 4 seconds</div>
+      </div>
+
+      <!-- Alert Messages -->
+      <div class="component-group">
+        <h3 class="component-title">Alert Messages</h3>
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+          <div class="alert alert-success">
+            <span style="font-size: 20px;">✓</span>
+            <div>
+              <strong>Success!</strong> Your changes have been saved successfully.
+            </div>
+          </div>
+
+          <div class="alert alert-danger">
+            <span style="font-size: 20px;">×</span>
+            <div>
+              <strong>Error!</strong> Something went wrong. Please try again.
+            </div>
+          </div>
+
+          <div class="alert alert-warning">
+            <span style="font-size: 20px;">⚠️</span>
+            <div>
+              <strong>Warning!</strong> This action cannot be undone.
+            </div>
+          </div>
+
+          <div class="alert alert-info">
+            <span style="font-size: 20px;">ℹ️</span>
+            <div>
+              <strong>Info:</strong> New features have been added to your dashboard.
+            </div>
+          </div>
+        </div>
+        <div class="code-block">&lt;div class="alert alert-success"&gt;
+  &lt;span&gt;✓&lt;/span&gt;
+  &lt;div&gt;&lt;strong&gt;Success!&lt;/strong&gt; Message here&lt;/div&gt;
+&lt;/div&gt;</div>
+      </div>
+    </section>
+
+    <!-- ============================================
+         5. TYPOGRAPHY SECTION
+         ============================================ -->
+    <section class="section" id="typography">
+      <div class="section-header">
+        <h2 class="section-title">Typography</h2>
+        <p class="section-description">Headings, text styles, and decorative elements</p>
+      </div>
+
+      <!-- Headings -->
+      <div class="component-group">
+        <h3 class="component-title">Headings</h3>
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+          <h1 class="h1">Heading 1 - 48px Extra Bold</h1>
+          <h2 class="h2">Heading 2 - 40px Bold</h2>
+          <h3 class="h3">Heading 3 - 32px Bold</h3>
+          <h4 class="h4">Heading 4 - 24px Semibold</h4>
+          <h5 class="h5">Heading 5 - 20px Semibold</h5>
+          <h6 class="h6">Heading 6 - 16px Semibold</h6>
+        </div>
+        <div class="code-block">&lt;h1 class="h1"&gt;Heading 1&lt;/h1&gt;
+&lt;h2 class="h2"&gt;Heading 2&lt;/h2&gt;</div>
+      </div>
+
+      <!-- Text Styles -->
+      <div class="component-group">
+        <h3 class="component-title">Text Styles</h3>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <p class="lead">Lead paragraph - Larger text for introductions and emphasis (20px, light weight)</p>
+          <p>Regular paragraph text with normal weight and size (16px)</p>
+          <p class="text-lg">Large text for better readability (18px)</p>
+          <p class="text-sm">Small text for secondary information (14px)</p>
+          <p class="text-xs">Extra small text for captions and footnotes (12px)</p>
+          <p><span class="font-bold">Bold text</span> • <span class="font-semibold">Semibold text</span> • <span class="font-medium">Medium weight</span></p>
+        </div>
+      </div>
+
+      <!-- Text Colors -->
+      <div class="component-group">
+        <h3 class="component-title">Text Colors</h3>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <p class="text-primary">Primary text color - Used for links and important elements</p>
+          <p class="text-success">Success text color - Used for positive messages</p>
+          <p class="text-danger">Danger text color - Used for errors and warnings</p>
+          <p class="text-warning">Warning text color - Used for caution messages</p>
+          <p class="text-muted">Muted text color - Used for secondary information</p>
+        </div>
+        <div class="code-block">&lt;p class="text-primary"&gt;Primary color&lt;/p&gt;
+&lt;p class="text-success"&gt;Success color&lt;/p&gt;</div>
+      </div>
+
+      <!-- Badges -->
+      <div class="component-group">
+        <h3 class="component-title">Badges & Labels</h3>
+        <div class="component-preview">
+          <span class="badge badge-primary">Primary</span>
+          <span class="badge badge-success">Success</span>
+          <span class="badge badge-danger">Danger</span>
+          <span class="badge badge-warning">Warning</span>
+          <span class="badge badge-info">Info</span>
+          <span class="badge badge-purple">Purple</span>
+          <span class="badge badge-pink">Pink</span>
+          <span class="badge badge-gray">Gray</span>
+        </div>
+        <div class="code-block">&lt;span class="badge badge-primary"&gt;Primary&lt;/span&gt;
+&lt;span class="badge badge-success"&gt;Success&lt;/span&gt;</div>
+      </div>
+
+      <!-- Badge Variants -->
+      <div class="component-group">
+        <h3 class="component-title">Badge Variants</h3>
+        <div class="component-preview">
+          <span class="badge badge-primary">Default</span>
+          <span class="badge badge-primary badge-outline">Outline</span>
+          <span class="badge badge-primary badge-lg">Large Badge</span>
+          <span class="badge badge-success badge-dot"></span>
+          <span class="badge badge-danger badge-dot"></span>
+          <span class="badge badge-warning badge-dot"></span>
+        </div>
+        <div class="code-block">&lt;span class="badge badge-primary badge-outline"&gt;Outline&lt;/span&gt;
+&lt;span class="badge badge-lg"&gt;Large&lt;/span&gt;
+&lt;span class="badge badge-dot"&gt;&lt;/span&gt;</div>
+      </div>
+
+      <!-- Badges with Icons -->
+      <div class="component-group">
+        <h3 class="component-title">Badges with Content</h3>
+        <div class="component-preview">
+          <span class="badge badge-primary">✓ Verified</span>
+          <span class="badge badge-success">🎉 New Feature</span>
+          <span class="badge badge-danger">🔥 Hot</span>
+          <span class="badge badge-warning">⚠️ Beta</span>
+          <span class="badge badge-info">ℹ️ Updated</span>
+          <span class="badge badge-purple">⭐ Premium</span>
+          <span class="badge badge-pink">💎 Pro</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================
+         6. TABS & ACCORDIONS SECTION
+         ============================================ -->
+    <section class="section" id="tabs">
+      <div class="section-header">
+        <h2 class="section-title">Tabs & Accordions</h2>
+        <p class="section-description">Organize content with tabs and collapsible sections</p>
+      </div>
+
+      <!-- Tabs -->
+      <div class="component-group">
+        <h3 class="component-title">Tab Navigation</h3>
+        <div class="tabs" id="demo-tabs">
+          <div class="tab active" onclick="switchTab(event, 'tab1')">Profile</div>
+          <div class="tab" onclick="switchTab(event, 'tab2')">Settings</div>
+          <div class="tab" onclick="switchTab(event, 'tab3')">Messages</div>
+          <div class="tab" onclick="switchTab(event, 'tab4')">Notifications</div>
+        </div>
+
+        <div class="tab-content">
+          <div id="tab1" class="tab-pane active">
+            <h4 class="mb-4">Profile Information</h4>
+            <p>View and edit your profile details, upload avatar, and manage your public presence.</p>
+            <div style="margin-top: 20px;">
+              <button class="btn btn-primary">Edit Profile</button>
+              <button class="btn btn-secondary">View Public Profile</button>
+            </div>
+          </div>
+
+          <div id="tab2" class="tab-pane">
+            <h4 class="mb-4">Account Settings</h4>
+            <p>Configure your account preferences, security settings, and privacy options.</p>
+            <div style="margin-top: 20px;">
+              <div class="alert alert-info">
+                <span>ℹ️</span>
+                <div>Two-factor authentication is currently disabled. Enable it for better security.</div>
+              </div>
+            </div>
+          </div>
+
+          <div id="tab3" class="tab-pane">
+            <h4 class="mb-4">Messages</h4>
+            <p>View your inbox, sent messages, and manage conversations with other users.</p>
+            <div style="margin-top: 20px;">
+              <span class="badge badge-primary badge-lg">5 Unread Messages</span>
+            </div>
+          </div>
+
+          <div id="tab4" class="tab-pane">
+            <h4 class="mb-4">Notification Center</h4>
+            <p>Manage your notification preferences and see recent activity.</p>
+            <div style="margin-top: 20px;">
+              <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                <input type="checkbox" checked>
+                <span>Email notifications</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="code-block" style="margin-top: 20px;">// Tab switching function
+function switchTab(event, tabId) {
+  // Remove active class from all tabs
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  
+  // Add active class to clicked tab
+  event.target.classList.add('active');
+  document.getElementById(tabId).classList.add('active');
+}</div>
+      </div>
+
+      <!-- Accordions -->
+      <div class="component-group">
+        <h3 class="component-title">Accordion (Collapsible)</h3>
+        <div class="accordion">
+          <div class="accordion-item">
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+              <span>What is this UI Kit?</span>
+              <span class="accordion-icon">▼</span>
+            </div>
+            <div class="accordion-body">
+              <div class="accordion-content">
+                This is a complete, production-ready UI component library built with pure HTML, CSS, and Vanilla JavaScript. No frameworks required! It includes 50+ components with modern design and animations.
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+              <span>How do I use these components?</span>
+              <span class="accordion-icon">▼</span>
+            </div>
+            <div class="accordion-body">
+              <div class="accordion-content">
+                Simply copy the HTML markup and corresponding CSS classes. All styles are included in this single file. You can customize colors and spacing using CSS variables defined in the :root selector.
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+              <span>Is it mobile responsive?</span>
+              <span class="accordion-icon">▼</span>
+            </div>
+            <div class="accordion-body">
+              <div class="accordion-content">
+                Yes! All components are fully responsive and work perfectly on mobile, tablet, and desktop devices. The grid system automatically adjusts to screen size, and touch-friendly interactions are built-in.
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+              <span>Can I customize the colors?</span>
+              <span class="accordion-icon">▼</span>
+            </div>
+            <div class="accordion-body">
+              <div class="accordion-content">
+                Absolutely! All colors are defined as CSS variables in the :root section. Change values like --primary, --success, --danger to match your brand colors. The entire UI will update automatically.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="code-block" style="margin-top: 20px;">// Accordion toggle function
+function toggleAccordion(header) {
+  const item = header.parentElement;
+  const isActive = item.classList.contains('active');
+  
+  // Close all accordions
+  document.querySelectorAll('.accordion-item').forEach(i => {
+    i.classList.remove('active');
+  });
+  
+  // Open clicked accordion if it wasn't active
+  if (!isActive) {
+    item.classList.add('active');
+  }
+}</div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- ============================================
+       MODALS (Hidden by default)
+       ============================================ -->
+  
+  <!-- Modal 1: Basic -->
+  <div class="modal-overlay" id="modal-1">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">Modal Title</h3>
+        <button class="modal-close" onclick="closeModal('modal-1')">×</button>
+      </div>
+      <div class="modal-body">
+        <p>This is a basic modal dialog. It can contain any content like text, forms, images, or other components.</p>
+        <p style="margin-top: 16px;">Modals are perfect for:</p>
+        <ul style="margin-left: 24px; margin-top: 8px;">
+          <li>User confirmations</li>
+          <li>Forms and data entry</li>
+          <li>Detailed information display</li>
+          <li>Image galleries</li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('modal-1')">Cancel</button>
+        <button class="btn btn-primary" onclick="closeModal('modal-1')">Okay</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 2: Form -->
+  <div class="modal-overlay" id="modal-2">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">Contact Form</h3>
+        <button class="modal-close" onclick="closeModal('modal-2')">×</button>
+      </div>
+      <div class="modal-body">
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+          <div>
+            <label style="display: block; font-weight: 500; margin-bottom: 8px;">Name</label>
+            <input type="text" placeholder="Enter your name" style="width: 100%; padding: 10px; border: 1px solid var(--gray-300); border-radius: var(--radius);">
+          </div>
+          <div>
+            <label style="display: block; font-weight: 500; margin-bottom: 8px;">Email</label>
+            <input type="email" placeholder="you@example.com" style="width: 100%; padding: 10px; border: 1px solid var(--gray-300); border-radius: var(--radius);">
+          </div>
+          <div>
+            <label style="display: block; font-weight: 500; margin-bottom: 8px;">Message</label>
+            <textarea placeholder="Your message here..." style="width: 100%; padding: 10px; border: 1px solid var(--gray-300); border-radius: var(--radius); resize: vertical; min-height: 100px;"></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('modal-2')">Cancel</button>
+        <button class="btn btn-success" onclick="closeModal('modal-2'); showToast('success')">Send Message</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 3: Confirmation -->
+  <div class="modal-overlay" id="modal-3">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">⚠️ Confirm Action</h3>
+        <button class="modal-close" onclick="closeModal('modal-3')">×</button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete this item? This action cannot be undone.</p>
+        <div class="alert alert-danger" style="margin-top: 16px;">
+          <span>⚠️</span>
+          <div><strong>Warning:</strong> This is a permanent action!</div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('modal-3')">Cancel</button>
+        <button class="btn btn-danger" onclick="closeModal('modal-3'); showToast('error')">Delete Permanently</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- ============================================
+       JAVASCRIPT
+       ============================================ -->
+  <script>
+    // ============================================
+    // MODAL FUNCTIONS
+    // ============================================
+    function openModal(modalId) {
+      const modal = document.getElementById(modalId);
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal(modalId) {
+      const modal = document.getElementById(modalId);
+      modal.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    // Close modal on ESC key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        document.querySelectorAll('.modal-overlay.active').forEach(modal => {
+          modal.classList.remove('active');
+        });
+        document.body.style.overflow = '';
+      }
+    });
+
+    // Close modal on overlay click
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+          overlay.classList.remove('active');
+          document.body.style.overflow = '';
+        }
+      });
+    });
+
+    // ============================================
+    // TOAST NOTIFICATIONS
+    // ============================================
+    function showToast(type) {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      
+      const config = {
+        success: {
+          title: 'Success!',
+          message: 'Your action completed successfully.',
+          icon: '✓'
+        },
+        error: {
+          title: 'Error!',
+          message: 'Something went wrong. Please try again.',
+          icon: '×'
+        },
+        warning: {
+          title: 'Warning!',
+          message: 'Please review your action before proceeding.',
+          icon: '⚠️'
+        },
+        info: {
+          title: 'Information',
+          message: 'Here\'s some helpful information for you.',
+          icon: 'ℹ️'
+        }
+      };
+
+      const data = config[type] || config.info;
+      
+      toast.className = `toast toast-${type}`;
+      toast.innerHTML = `
+        <div class="toast-icon">${data.icon}</div>
+        <div class="toast-content">
+          <div class="toast-title">${data.title}</div>
+          <div class="toast-message">${data.message}</div>
+        </div>
+        <button onclick="this.parentElement.remove()" style="background: none; border: none; color: var(--gray-400); cursor: pointer; font-size: 20px; padding: 0; margin-left: 8px;">×</button>
+      `;
+      
+      container.appendChild(toast);
+      
+      // Auto remove after 4 seconds
+      setTimeout(() => {
+        toast.style.animation = 'slideInRight 0.3s ease reverse';
+        setTimeout(() => toast.remove(), 300);
+      }, 4000);
+    }
+
+    // ============================================
+    // TAB SWITCHING
+    // ============================================
+    function switchTab(event, tabId) {
+      // Remove active class from all tabs and panes
+      document.querySelectorAll('#demo-tabs .tab').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      document.querySelectorAll('.tab-pane').forEach(pane => {
+        pane.classList.remove('active');
+      });
+      
+      // Add active class to clicked tab and corresponding pane
+      event.target.classList.add('active');
+      document.getElementById(tabId).classList.add('active');
+    }
+
+    // ============================================
+    // ACCORDION TOGGLE
+    // ============================================
+    function toggleAccordion(header) {
+      const item = header.parentElement;
+      const isActive = item.classList.contains('active');
+      
+      // Close all accordion items
+      document.querySelectorAll('.accordion-item').forEach(accordionItem => {
+        accordionItem.classList.remove('active');
+      });
+      
+      // Open clicked item if it wasn't active
+      if (!isActive) {
+        item.classList.add('active');
+      }
+    }
+
+    // ============================================
+    // SMOOTH SCROLL FOR NAVIGATION
+    // ============================================
+    document.querySelectorAll('.navbar-nav a').forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const targetId = link.getAttribute('href');
+        const targetElement = document.querySelector(targetId);
+        
+        if (targetElement) {
+          targetElement.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }
+      });
+    });
+
+    // ============================================
+    // INITIALIZATION
+    // ============================================
+    window.addEventListener('DOMContentLoaded', () => {
+      console.log('%c🎨 Advanced UI Kit v1.0', 'font-size: 18px; font-weight: bold; color: #2563eb;');
+      console.log('%c✨ Features:', 'font-weight: bold; margin-top: 8px;');
+      console.log('• 50+ UI Components');
+      console.log('• Pure Vanilla JavaScript');
+      console.log('• No Dependencies');
+      console.log('• Fully Responsive');
+      console.log('• Production Ready');
+      console.log('• Copy-Paste Ready Code');
+      console.log('\n%c📖 Components Available:', 'font-weight: bold; color: #16a34a;');
+      console.log('1. Buttons (8 colors, 4 sizes, 5 variants)');
+      console.log('2. Cards (Basic, Image, Stats, Elevated)');
+      console.log('3. Icons (Emoji + SVG based)');
+      console.log('4. Modals (3 types with animations)');
+      console.log('5. Notifications (Toasts + Alerts)');
+      console.log('6. Typography (Headings, Text, Badges)');
+      console.log('7. Tabs (Animated switching)');
+      console.log('8. Accordions (Collapsible sections)');
+      console.log('\n%c💡 Quick Start:', 'font-weight: bold; color: #f59e0b;');
+      console.log('• Copy HTML markup from code blocks');
+      console.log('• CSS classes are self-contained');
+      console.log('• Customize colors in :root variables');
+      console.log('• All JavaScript functions included');
+      console.log('\n%c⌨️ Keyboard Shortcuts:', 'font-weight: bold; color: #9333ea;');
+      console.log('ESC - Close any open modal');
+      
+      // Show welcome toast
+      setTimeout(() => {
+        showToast('success');
+      }, 500);
+    });
+
+    // ============================================
+    // COPY CODE BLOCK FUNCTIONALITY
+    // ============================================
+    document.querySelectorAll('.code-block').forEach(block => {
+      block.style.position = 'relative';
+      block.style.cursor = 'pointer';
+      
+      block.addEventListener('click', () => {
+        const text = block.textContent;
+        navigator.clipboard.writeText(text).then(() => {
+          const originalBg = block.style.background;
+          block.style.background = 'var(--success)';
+          
+          setTimeout(() => {
+            block.style.background = originalBg;
+          }, 200);
+          
+          // Show mini toast
+          const miniToast = document.createElement('div');
+          miniToast.textContent = '✓ Copied!';
+          miniToast.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--success);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 999px;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: var(--shadow-lg);
+            z-index: 9999;
+            animation: slideIn 0.3s ease;
+          `;
+          document.body.appendChild(miniToast);
+          
+          setTimeout(() => {
+            miniToast.style.animation = 'slideIn 0.3s ease reverse';
+            setTimeout(() => miniToast.remove(), 300);
+          }, 1500);
+        });
+      });
+      
+      // Add hover effect
+      block.addEventListener('mouseenter', () => {
+        block.style.outline = '2px solid var(--primary)';
+      });
+      
+      block.addEventListener('mouseleave', () => {
+        block.style.outline = 'none';
+      });
+    });
+
+    // ============================================
+    // SCROLL TO TOP BUTTON
+    // ============================================
+    const scrollTopBtn = document.createElement('button');
+    scrollTopBtn.innerHTML = '↑';
+    scrollTopBtn.style.cssText = `
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: white;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      box-shadow: var(--shadow-lg);
+      display: none;
+      z-index: 999;
+      transition: all 0.3s;
+    `;
+    
+    scrollTopBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+    
+    scrollTopBtn.addEventListener('mouseenter', () => {
+      scrollTopBtn.style.transform = 'scale(1.1)';
+    });
+    
+    scrollTopBtn.addEventListener('mouseleave', () => {
+      scrollTopBtn.style.transform = 'scale(1)';
+    });
+    
+    document.body.appendChild(scrollTopBtn);
+    
+    // Show/hide scroll button
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        scrollTopBtn.style.display = 'block';
+      } else {
+        scrollTopBtn.style.display = 'none';
+      }
+    });
+
+    // ============================================
+    // COMPONENT COUNTER
+    // ============================================
+    setTimeout(() => {
+      const componentCount = {
+        buttons: document.querySelectorAll('.btn').length,
+        cards: document.querySelectorAll('.card').length,
+        badges: document.querySelectorAll('.badge').length,
+        modals: document.querySelectorAll('.modal').length,
+        toasts: 4, // Success, Error, Warning, Info
+        alerts: document.querySelectorAll('.alert').length,
+        tabs: document.querySelectorAll('.tab').length,
+        accordions: document.querySelectorAll('.accordion-item').length
+      };
+      
+      const total = Object.values(componentCount).reduce((a, b) => a + b, 0);
+      
+      console.log('\n%c📊 Component Statistics:', 'font-weight: bold; color: #0ea5e9;');
+      console.log(`Total Interactive Components: ${total}`);
+      console.log(`• Buttons: ${componentCount.buttons}`);
+      console.log(`• Cards: ${componentCount.cards}`);
+      console.log(`• Badges: ${componentCount.badges}`);
+      console.log(`• Modals: ${componentCount.modals}`);
+      console.log(`• Toast Types: ${componentCount.toasts}`);
+      console.log(`• Alerts: ${componentCount.alerts}`);
+      console.log(`• Tabs: ${componentCount.tabs}`);
+      console.log(`• Accordion Items: ${componentCount.accordions}`);
+    }, 1000);
+  </script>
+
+</body>
+</html>">
+          <button class="btn btn-primary">Primary</button>
+          <button class="btn btn-success">Success</button>
+          <button class="btn btn-danger">Danger</button>
+          <button class="btn btn-warning">Warning</button>
+          <button class="btn btn-info">Info</button>
+          <button class="btn btn-purple">Purple</button>
+          <button class="btn btn-pink">Pink</button>
+          <button class="btn btn-secondary">Secondary</button>
+        </div>
+        <div class="code-block">&lt;button class="btn btn-primary"&gt;Primary&lt;/button&gt;
+&lt;button class="btn btn-success"&gt;Success&lt;/button&gt;
+&lt;button class="btn btn-danger"&gt;Danger&lt;/button&gt;</div>
+      </div>
+
+      <!-- Button Sizes -->
+      <div class="component-group">
+        <h3 class="component-title">Button Sizes</h3>
+        <div class="component-preview">
+          <button class="btn btn-primary btn-sm">Small</button>
+          <button class="btn btn-primary">Default</button>
+          <button class="btn btn-primary btn-lg">Large</button>
+          <button class="btn btn-primary btn-xl">Extra Large</button>
+        </div>
+        <div class="code-block">&lt;button class="btn btn-sm"&gt;Small&lt;/button&gt;
+&lt;button class="btn btn-lg"&gt;Large&lt;/button&gt;</div>
+      </div>
+
+      <!-- Button Variants -->
+      <div class="component-group">
+        <h3 class="component-title">Button Variants</h3>
+        <div class="component-preview">
+          <button class="btn btn-primary">Solid</button>
+          <button class="btn btn-outline">Outline</button>
+          <button class="btn btn-ghost">Ghost</button>
+          <button class="btn btn-primary btn-rounded">Rounded</button>
+          <button class="btn btn-primary" disabled>Disabled</button>
+        </div>
+        <div class="code-block">&lt;button class="btn btn-outline"&gt;Outline&lt;/button&gt;
+&lt;button class="btn btn-ghost"&gt;Ghost&lt;/button&gt;
+&lt;button class="btn btn-rounded"&gt;Rounded&lt;/button&gt;</div>
+      </div>
+
+      <!-- Button with Icons -->
+      <div class="component-group">
+        <h3 class="component-title">Buttons with Icons</h3>
+        <div class="component-preview">
+          <button class="btn btn-primary">
+            <span>📥</span> Download
+          </button>
+          <button class="btn btn-success">
+            ✅ Approve
+          </button>
+          <button class="btn btn-danger">
+            🗑️ Delete
+          </button>
+          <button class="btn btn-info">
+            📤 Share <span>→</span>
+          </button>
+        </div>
+        <div class="code-block">&lt;button class="btn btn-primary"&gt;
+  &lt;span&gt;📥&lt;/span&gt; Download
+&lt;/button&gt;</div>
+      </div>
+
+      <!-- Icon Buttons -->
+      <div class="component-group">
+        <h3 class="component-title">Icon-Only Buttons</h3>
+        <div class="component-preview">
+          <button class="btn btn-primary btn-icon">✏️</button>
+          <button class="btn btn-success btn-icon">✓</button>
+          <button class="btn btn-danger btn-icon">×</button>
+          <button class="btn btn-info btn-icon">?</button>
+        </div>
+        <div class="code-block">&lt;button class="btn btn-primary btn-icon"&gt;✏️&lt;/button&gt;</div>
+      </div>
+
+      <!-- Button Groups -->
+      <div class="component-group">
+        <h3 class="component-title">Button Groups</h3>
+        <div class="component-preview

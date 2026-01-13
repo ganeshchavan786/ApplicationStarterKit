@@ -8,7 +8,7 @@ from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, RedirectResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 import os
 from fastapi.exceptions import RequestValidationError
@@ -103,10 +103,21 @@ app.add_middleware(
 )
 
 
-# Root endpoint
+# Root endpoint - Serve website landing page
 @app.get("/")
 async def root():
-    """Root endpoint - API info"""
+    """Root endpoint - Serve website landing page"""
+    file_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "frontend", "website", "index.html")
+    if os.path.exists(file_path):
+        return FileResponse(file_path, media_type="text/html")
+    return RedirectResponse(url="/frontend/website/index.html")
+
+
+# API info endpoint
+@app.get("/api")
+@app.get("/api/")
+async def api_info():
+    """API info endpoint"""
     return {
         "success": True,
         "message": f"{settings.APP_NAME} API is running",
@@ -218,6 +229,6 @@ if __name__ == "__main__":
     uvicorn.run(
         "app.main:app",
         host="0.0.0.0",
-        port=8501,
+        port=8901,
         reload=settings.DEBUG
     )
