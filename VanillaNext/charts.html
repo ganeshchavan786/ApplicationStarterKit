@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Charts Library - VanillaNext</title>
+    <!-- Console Health Check (Testing Script) -->
+    <script src="js/debug-helper.js"></script>
+
+    <link rel="stylesheet" href="css/main.css?v=2">
+    <link rel="stylesheet" href="css/charts.css?v=2">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .admin-layout {
+            display: flex;
+            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .admin-sidebar {
+            width: 260px;
+            background: var(--bg-surface);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            z-index: 50;
+        }
+
+        .admin-main {
+            flex: 1;
+            margin-left: 260px;
+            background: var(--bg-body);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .admin-header {
+            height: 64px;
+            background: var(--bg-surface);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            position: sticky;
+            top: 0;
+            z-index: 40;
+        }
+
+        .sidebar-brand {
+            height: 64px;
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            font-weight: 800;
+            font-size: 1.25rem;
+            color: var(--primary-600);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .sidebar-nav {
+            padding: 16px 0;
+            flex: 1;
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            padding: 10px 24px;
+            color: var(--gray-600);
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.2s;
+            font-size: 0.875rem;
+        }
+
+        .sidebar-link:hover,
+        .sidebar-link.active {
+            background: var(--primary-50);
+            color: var(--primary-600);
+            border-right: 3px solid var(--primary-600);
+        }
+
+        .sidebar-icon {
+            width: 20px;
+            text-align: center;
+            margin-right: 12px;
+            font-size: 1.1rem;
+        }
+
+        @media (max-width: 1024px) {
+            .admin-sidebar {
+                display: none;
+            }
+
+            .admin-sidebar.open {
+                display: flex;
+            }
+
+            .admin-main {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-body">
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar" id="sidebar">
+            <div class="sidebar-brand">⚡ VanillaNext</div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="sidebar-link"><span class="sidebar-icon">📊</span> Dashboard</a>
+                <div class="text-xs font-bold text-muted uppercase px-6 mt-6 mb-2">Management</div>
+                <a href="users.html" class="sidebar-link admin-only"><span class="sidebar-icon">👥</span> Users</a>
+                <a href="audit.html" class="sidebar-link admin-only"><span class="sidebar-icon">🛡️</span> Audit
+                    Logs</a>
+                <a href="companies.html" class="sidebar-link super-admin-only"><span class="sidebar-icon">🏢</span>
+                    Companies</a>
+                <a href="permissions.html" class="sidebar-link super-admin-only"><span class="sidebar-icon">🗝️</span>
+                    Permissions</a>
+                <a href="charts.html" class="sidebar-link active"><span class="sidebar-icon">📈</span> Charts</a>
+                <div class="text-xs font-bold text-muted uppercase px-6 mt-6 mb-2">Settings</div>
+                <a href="profile.html" class="sidebar-link"><span class="sidebar-icon">👤</span> Profile</a>
+                <a href="#" onclick="Auth.logout()" class="sidebar-link text-danger mt-auto mb-4"><span
+                        class="sidebar-icon">🚪</span> Logout</a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <header class="admin-header">
+                <div class="flex items-center gap-4">
+                    <button class="btn btn-ghost btn-sm lg:hidden" onclick="toggleSidebar()">☰</button>
+                    <h2 class="text-lg font-bold">Charts Library</h2>
+                </div>
+            </header>
+
+            <div class="p-6 max-w-7xl mx-auto w-full">
+                <!-- Real-time Stats -->
+                <div class="stats-row">
+                    <div class="stats-widget"
+                        onclick="Charts.showToast('💰', 'Total Orders', '302 orders • +12% increase')">
+                        <div class="stats-icon">💰</div>
+                        <div class="stats-header">
+                            <div class="stats-label">Total Orders</div>
+                            <button class="stats-menu">⋮</button>
+                        </div>
+                        <div class="stats-value" id="orders-value">302</div>
+                        <div class="stats-badge">↑ +12%</div>
+                        <div class="stats-description">Compare to last week</div>
+                        <div class="stats-footer">Last updated: <span id="orders-time">Just now</span></div>
+                    </div>
+
+                    <div class="stats-widget" onclick="Charts.showToast('📈', 'Revenue', '$42,305 • +8.4% increase')">
+                        <div class="stats-icon">📉</div>
+                        <div class="stats-header">
+                            <div class="stats-label">Revenue</div>
+                            <button class="stats-menu">⋮</button>
+                        </div>
+                        <div class="stats-value" id="revenue-value">42,305</div>
+                        <div class="stats-badge">↑ +8.4%</div>
+                        <div class="stats-description">Target: $50,000</div>
+                        <div class="stats-footer">Last updated: <span id="revenue-time">Just now</span></div>
+                    </div>
+
+                    <div class="stats-widget" onclick="Charts.showToast('👥', 'Active Users', '1,240 users online')">
+                        <div class="stats-icon">👤</div>
+                        <div class="stats-header">
+                            <div class="stats-label">Active Users</div>
+                            <button class="stats-menu">⋮</button>
+                        </div>
+                        <div class="stats-value" id="users-value">1,240</div>
+                        <div class="stats-badge">↑ +5%</div>
+                        <div class="stats-description">Real-time unique visitors</div>
+                        <div class="stats-footer">Last updated: <span id="users-time">Just now</span></div>
+                    </div>
+                </div>
+
+                <!-- Charts Grid -->
+                <div class="charts-grid">
+                    <!-- Chart.js Real-time Line -->
+                    <div class="chart-widget">
+                        <div class="widget-header">
+                            <div class="widget-title">📈 Live Server Traffic</div>
+                            <div class="widget-badge live">● LIVE</div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="realtimeLineChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Chart.js Real-time Bar -->
+                    <div class="chart-widget">
+                        <div class="widget-header">
+                            <div class="widget-title">📊 Sales by Category</div>
+                            <div class="widget-badge live">● UPDATING</div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="realtimeBarChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Chart.js Interactive Pie -->
+                    <div class="chart-widget">
+                        <div class="widget-header">
+                            <div class="widget-title">🍰 Traffic Sources</div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="pieChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Chart.js Interactive Doughnut -->
+                    <div class="chart-widget">
+                        <div class="widget-header">
+                            <div class="widget-title">🍩 User Demographics</div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="doughnutChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Apex Area Real-time -->
+                    <div class="chart-widget">
+                        <div class="widget-header">
+                            <div class="widget-title">📉 Revenue Projection</div>
+                        </div>
+                        <div class="chart-container" id="areaChart"></div>
+                    </div>
+
+                    <!-- Apex Mixed -->
+                    <div class="chart-widget">
+                        <div class="widget-header">
+                            <div class="widget-title">📊 Order Fulfillment</div>
+                        </div>
+                        <div class="chart-container" id="mixedChart"></div>
+                    </div>
+
+                    <!-- Apex Heatmap -->
+                    <div class="chart-widget">
+                        <div class="widget-header">
+                            <div class="widget-title">🔥 Activity Heatmap</div>
+                        </div>
+                        <div class="chart-container" id="heatmapChart"></div>
+                    </div>
+
+                    <!-- Apex Radial -->
+                    <div class="chart-widget">
+                        <div class="widget-header">
+                            <div class="widget-title">🎯 Dept Goals</div>
+                        </div>
+                        <div class="chart-container" id="radialChart"></div>
+                    </div>
+
+                    <!-- Chart.js Radar -->
+                    <div class="chart-widget">
+                        <div class="widget-header">
+                            <div class="widget-title">🕸️ Product Comparison</div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="radarChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Chart.js Polar Area -->
+                    <div class="chart-widget">
+                        <div class="widget-header">
+                            <div class="widget-title">❄️ Browser Market Share</div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="polarChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/apexcharts/3.45.1/apexcharts.min.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/components/Charts.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Stats
+            Charts.initStatsWidget('orders', 302, 3000);
+            Charts.initStatsWidget('revenue', 42305, 5000);
+            Charts.initStatsWidget('users', 1240, 2000);
+
+            // Chart.js
+            Charts.createRealtimeLine('realtimeLineChart');
+            Charts.createRealtimeBar('realtimeBarChart');
+            Charts.createPie('pieChart');
+            Charts.createDoughnut('doughnutChart');
+            Charts.createRadar('radarChart');
+            Charts.createPolarArea('polarChart');
+
+            // Apex
+            Charts.createRealtimeArea('areaChart');
+            Charts.createMixed('mixedChart');
+            Charts.createHeatmap('heatmapChart');
+            Charts.createRadial('radialChart');
+        });
+
+        const toggleSidebar = () => {
+            document.getElementById('sidebar').classList.toggle('open');
+        };
+    </script>
+</body>
+
+</html>

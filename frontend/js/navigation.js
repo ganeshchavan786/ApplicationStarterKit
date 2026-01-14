@@ -417,6 +417,60 @@ function updateActiveNavLink(pageName) {
   });
 }
 
+// ============================================
+// PWA & MOBILE OPTIMIZATION
+// ============================================
+let deferredPrompt;
+
+function initPWA() {
+  const offlineBanner = document.getElementById('offline-banner');
+  const installBanner = document.getElementById('install-banner');
+
+  // 1. Connectivity Detection
+  window.addEventListener('online', () => {
+    if (offlineBanner) offlineBanner.classList.remove('show');
+    Toast.info('Back online! 🟢');
+  });
+
+  window.addEventListener('offline', () => {
+    if (offlineBanner) offlineBanner.classList.add('show');
+    Toast.warning('Working offline... 🔴');
+  });
+
+  // Initial check
+  if (!navigator.onLine && offlineBanner) offlineBanner.classList.add('show');
+
+  // 2. Install Prompt logic
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    if (installBanner) installBanner.classList.add('show');
+  });
+
+  window.addEventListener('appinstalled', () => {
+    if (installBanner) installBanner.classList.remove('show');
+    deferredPrompt = null;
+    Toast.success('App installed successfully! 🎉');
+  });
+}
+
+window.installPWA = async function () {
+  if (!deferredPrompt) return;
+
+  const installBanner = document.getElementById('install-banner');
+  if (installBanner) installBanner.classList.remove('show');
+
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  console.log(`User response to install: ${outcome}`);
+  deferredPrompt = null;
+};
+
+window.dismissInstallBanner = function () {
+  const installBanner = document.getElementById('install-banner');
+  if (installBanner) installBanner.classList.remove('show');
+};
+
 // Toggle sidebar (mobile)
 window.toggleSidebar = function () {
   const sidebar = document.querySelector('.sidebar');
@@ -434,5 +488,58 @@ window.closeSidebar = function () {
   if (sidebar) sidebar.classList.remove('open');
   if (overlay) overlay.classList.remove('active');
 };
+
+function initMobileUI() {
+  const sidebar = document.querySelector('.sidebar');
+  const overlay = document.querySelector('.sidebar-overlay');
+
+  if (!sidebar) return;
+
+  // Professional Swipe Support
+  let touchStartX = 0;
+  let touchEndX = 0;
+
+  document.addEventListener('touchstart', (e) => {
+    touchStartX = e.changedTouches[0].screenX;
+  }, false);
+
+  document.addEventListener('touchend', (e) => {
+    touchEndX = e.changedTouches[0].screenX;
+    handleSwipe();
+  }, false);
+
+  function handleSwipe() {
+    const swipeDistance = touchEndX - touchStartX;
+    const isMobile = window.innerWidth <= 768;
+
+    if (!isMobile) return;
+
+    // Swipe right from edge (open)
+    if (swipeDistance > 80 && touchStartX < 40) {
+      window.toggleSidebar();
+    }
+    // Swipe left anywhere on screen (close) if sidebar is open
+    if (swipeDistance < -80 && sidebar.classList.contains('open')) {
+      window.closeSidebar();
+    }
+  }
+
+  // Ensure sidebar closes on navigation and overlay click
+  if (overlay) {
+    overlay.addEventListener('click', window.closeSidebar);
+  }
+
+  document.addEventListener('click', (e) => {
+    if (window.innerWidth <= 768 && e.target.closest('.sidebar-link')) {
+      window.closeSidebar();
+    }
+  });
+}
+
+// Auto-init on load
+document.addEventListener('DOMContentLoaded', () => {
+  initPWA();
+  initMobileUI();
+});
 
 console.log('✅ Navigation.js loaded');

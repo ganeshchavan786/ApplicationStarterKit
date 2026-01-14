@@ -85,6 +85,30 @@ Building a backend from scratch is time-consuming. This starter kit provides eve
 - **Correlation ID** - X-Request-ID for distributed tracing
 - **HTTPS Redirect** - Automatic in production
 - **Input Validation** - Pydantic v2 with custom validators
+- **Progressive Web App (PWA)** - Offline support and installable
+- **Mobile Optimized** - Swipe gestures and bottom-sheet modals
+
+---
+
+## 🎨 Frontend & PWA Features (New!)
+
+### ⚡ Progressive Web App
+- **Service Worker:** Offline caching for core assets and pages.
+- **Web App Manifest:** Installable on Android, iOS, and Desktop.
+- **Offline Indicator:** Real-time connectivity monitoring with UI feedback.
+- **Custom Install UI:** Integrated "Install Now" banner for better conversion.
+
+### 📱 Professional Mobile UI
+- **Swipe Support:** Intuitive edge-swipe to open/close sidebar.
+- **Bottom-Sheet Modals:** Enhanced mobile-first modal transitions.
+- **Touch-Friendly UI:** All interactive elements follow 44px hit-target standards.
+- **Responsive Tables:** Horizontal scroll and stacking support for data.
+
+### 📈 Advanced Charts Library
+- **Localized Assets:** `ApexCharts` and `Chart.js` hosted locally for offline performance.
+- **External Data Handling:** Centralized `chart-data.js` for easier maintenance.
+- **Real-time Updates:** Charts dynamic redraw without page refresh.
+- **Interactive Feedback:** Custom toast system for data segment clicks.
 
 ---
 
@@ -298,4 +322,4 @@ MIT License
 
 ---
 
-**Version:** 1.0.0 | **Port:** 8501 | **Standards:** 2026 Industry Compliant
+**Version:** 2.1.0 | **Port:** 8501 | **Standards:** 2026 Industry Compliant | **Mobile:** PWA Ready
